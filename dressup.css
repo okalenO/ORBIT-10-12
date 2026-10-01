@@ -301,6 +301,29 @@
   height: var(--character-h, 68.7037%);
 }
 
+.dressup-character-hotspot {
+  position: absolute;
+  z-index: 6;
+  left: 0.6771%;
+  top: 26.6667%;
+  width: 33.6458%;
+  height: 68.7037%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+.dressup-scene.is-visible .dressup-character-hotspot:not(:disabled) {
+  pointer-events: auto;
+}
+
+.dressup-character-hotspot:focus-visible {
+  outline: 2px dashed var(--leaf-dark);
+  outline-offset: -4px;
+}
+
 .dressup-character-sway {
   transform-origin: 18.1% 94.7%;
   animation: dressup-idle-sway 4.1s ease-in-out infinite;

@@ -17,15 +17,15 @@ const wardrobeClothesHotspot = document.querySelector(".wardrobe-clothes-hotspot
 const bedroomOutfitSources = {
   cuteez: {
     src: "assets/dressup/trim/character-cuteez.png",
-    geometry: [2.7604, 28.3333, 30.1562, 66.5741],
+    geometry: [36.8, 57.8, 15.3, 32.4],
   },
   plaid: {
     src: "assets/dressup/trim/character-striped.png",
-    geometry: [2.7604, 28.3333, 30.1562, 66.5741],
+    geometry: [36.8, 57.8, 15.3, 32.4],
   },
   henley: {
     src: "assets/dressup/trim/character-plaid.png",
-    geometry: [2.9167, 29.0741, 30, 65.8333],
+    geometry: [36.9, 57.8, 15.2, 32.4],
   },
 };
 
@@ -35,6 +35,7 @@ const bedroomCopy = {
     alreadyAwake: "I’m already awake… zzZ",
     curtainWake: "It’s so bright… okay, okay, I’m getting up…",
     specialDay: "Today is a special day.",
+    lunchInvite: "Want to head out for lunch?\nWe could take a nice, leisurely walk, too~",
     awakeReally: "I’m awake… I’m awake, really…",
     lookingFor: "What are you looking for?",
     soccer: "I haven’t played soccer with my friends in ages.",
@@ -48,6 +49,7 @@ const bedroomCopy = {
     alreadyAwake: "我已经醒了……zzZ",
     curtainWake: "好亮……好啦，我起床啦……",
     specialDay: "今天是个特别的日子呢。",
+    lunchInvite: "要不要出门吃午餐？\n顺便慢慢走一走吧~",
     awakeReally: "我醒了…我醒了……",
     lookingFor: "你在找什么呀？",
     soccer: "好久没和朋友们踢足球了呢。",
@@ -61,6 +63,7 @@ const bedroomCopy = {
     alreadyAwake: "나 이미 깼어… zzZ",
     curtainWake: "너무 밝아… 알겠어, 이제 일어날게…",
     specialDay: "오늘은 특별한 날이네.",
+    lunchInvite: "점심 먹으러 나갈까?\n나간 김에 느긋하게 산책도 하자~",
     awakeReally: "일어났어… 진짜 일어났다니까…",
     lookingFor: "뭘 찾고 있어?",
     soccer: "친구들이랑 축구 안 한 지 꽤 됐네.",
@@ -103,6 +106,8 @@ let returnRevealTimer;
 // GIF metadata: 5 frames, 5400 ms per cycle. Keep the original interaction timings.
 const bedroomCharacterTiming = { play: 5400, wait: 6000 };
 let awakeMotionTimer;
+let awakeMotionToken = 0;
+let lunchInviteTimer;
 
 function setBedroomState(nextState) {
   window.orbitGameState.bedroomState = nextState;
@@ -118,6 +123,7 @@ function setBedroomState(nextState) {
 }
 
 function stopAwakeMotion() {
+  awakeMotionToken += 1;
   window.clearTimeout(awakeMotionTimer);
   bedroomScene.classList.remove("is-awake-motion");
 }
@@ -128,10 +134,19 @@ function scheduleAwakeMotion() {
     window.orbitGameState.bedroomState === "awake" &&
     !window.orbitGameState.confirmedOutfit;
   if (!canPlay()) return;
-  awakeMotionTimer = window.setTimeout(() => {
+  const token = awakeMotionToken;
+  awakeMotionTimer = window.setTimeout(async () => {
     if (!canPlay()) return;
     const src = sitUpCharacter.getAttribute("src").split("?")[0];
-    sitUpCharacter.setAttribute("src", `${src}?play=${Date.now()}`);
+    // Keep the opaque still visible until the restarted GIF is loaded and decoded.
+    const nextSource = `${src}?play=${Date.now()}`;
+    const readyImage = new Image();
+    readyImage.src = nextSource;
+    try { await readyImage.decode(); } catch (_) { return; }
+    if (token !== awakeMotionToken || !canPlay()) return;
+    sitUpCharacter.src = nextSource;
+    try { await sitUpCharacter.decode(); } catch (_) { return; }
+    if (token !== awakeMotionToken || !canPlay()) return;
     bedroomScene.classList.add("is-awake-motion");
     awakeMotionTimer = window.setTimeout(scheduleAwakeMotion, bedroomCharacterTiming.play);
   }, bedroomCharacterTiming.wait);
@@ -160,6 +175,7 @@ function hideBubble() {
 }
 
 function showDialogue(key, duration = 4400) {
+  window.clearTimeout(lunchInviteTimer);
   window.clearTimeout(bubbleHideTimer);
   bubble.classList.remove("is-visible");
   bubble.classList.add("is-resetting");
@@ -246,7 +262,15 @@ function handleCharacterClick() {
 
   if (window.orbitGameState.bedroomState === "awake") {
     if (bedroomScene.classList.contains("has-dressed-character")) {
-      showDialogue("specialDay");
+      showDialogue("lunchInvite", 6500);
+      window.clearTimeout(lunchInviteTimer);
+      lunchInviteTimer = window.setTimeout(() => {
+        if (window.orbitGameState.currentScene !== "bedroom" ||
+            window.orbitGameState.bedroomState !== "awake") return;
+        window.dispatchEvent(new CustomEvent("orbit-next-scene-request", {
+          detail: { from: "bedroom", next: "lunch", outfit: window.orbitGameState.confirmedOutfit },
+        }));
+      }, 6500);
       return;
     }
     const options = ["specialDay", "awakeReally", "lookingFor"].filter(
@@ -296,6 +320,7 @@ function toggleWardrobeDoor() {
   if (window.orbitGameState.currentScene !== "bedroom" ||
       window.orbitGameState.bedroomState !== "awake") return;
   const isOpen = window.orbitGameState.wardrobeState !== "open";
+  window.clearTimeout(lunchInviteTimer);
   window.orbitGameState.wardrobeState = isOpen ? "open" : "closed";
   bedroomScene.classList.toggle("is-wardrobe-open", isOpen);
   updateWardrobeHotspots();
@@ -306,6 +331,7 @@ function enterWardrobeDressup() {
       window.orbitGameState.bedroomState !== "awake" ||
       window.orbitGameState.wardrobeState !== "open") return;
   clearSceneTimers();
+  window.clearTimeout(lunchInviteTimer);
   stopAwakeMotion();
   setBedroomState("wardrobe");
   hideBubble();
@@ -391,6 +417,7 @@ function updateBedroomBgm(enabled) {
 function returnToPreviousScene() {
   if (sceneReturnMask.classList.contains("is-active")) return;
   stopAwakeMotion();
+  window.clearTimeout(lunchInviteTimer);
   closePhone();
   hideBubble();
   sceneReturnMask.classList.add("is-active");
@@ -408,6 +435,7 @@ function returnToPreviousScene() {
 function resetBedroomScene() {
   clearSceneTimers();
   stopAwakeMotion();
+  window.clearTimeout(lunchInviteTimer);
   closePhone();
   hideBubble();
   sceneClasses.forEach((className) => bedroomScene.classList.remove(className));

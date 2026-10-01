@@ -11,6 +11,7 @@ const bearCostumeWrap = document.querySelector(".bear-costume-wrap");
 const bearCostumeHit = document.querySelector(".bear-costume-hit");
 const dressupConfirmButton = document.querySelector(".dressup-confirm-button");
 const garmentSlots = [...document.querySelectorAll(".garment-slot")];
+const dressupCharacterHotspot = document.querySelector(".dressup-character-hotspot");
 
 // 使用两个角色图层交叉切换：新素材会先在不可见图层完成加载，
 // 再与旧素材交叉淡入淡出，从根本上避免更换 src 时的白闪。
@@ -43,6 +44,7 @@ const dressupCharacterGeometry = {
 
 const dressupCopy = {
   en: {
+    pajamaQuestion: "What should I wear today~?",
     confirm: "CONFIRM",
     plaid: "Oh, you like this one too?",
     cuteez: "…This is a little embarrassing, hehe.",
@@ -50,6 +52,7 @@ const dressupCopy = {
     bear: "It is really cute, but… let’s wear something else today~",
   },
   zh: {
+    pajamaQuestion: "今天要穿什么呢~？",
     confirm: "确定",
     plaid: "诶，你也喜欢这一件吗？",
     cuteez: "…这个有点害羞诶？hh",
@@ -57,6 +60,7 @@ const dressupCopy = {
     bear: "虽然是很可爱啦，但是今天还是换一件吧~",
   },
   ko: {
+    pajamaQuestion: "오늘은 뭐 입을까~?",
     confirm: "확인",
     plaid: "어, 너도 이거 좋아해?",
     cuteez: "…이건 좀 부끄러운데? ㅎㅎ",
@@ -288,6 +292,7 @@ function playCharacterSwap(outfit) {
   clearPajamaTimers();
   window.clearTimeout(sparkleTimer);
   currentOutfit = outfit;
+  dressupCharacterHotspot.disabled = outfit !== "pajama";
 
   dressupSparkles.classList.remove("is-active");
   void dressupSparkles.offsetWidth;
@@ -493,6 +498,7 @@ function resetDressupState({ clearProgress = false } = {}) {
   selectedSlot?.classList.add("is-selected");
   suitcaseClicks = 0;
   currentOutfit = outfitState.selectedOutfit || "pajama";
+  dressupCharacterHotspot.disabled = currentOutfit !== "pajama";
   if (outfitState.bearUnlocked) {
     suitcaseClicks = 3;
     bearCostumeWrap.classList.add("is-unlocked");
@@ -559,6 +565,11 @@ slotMotion.forEach((state) => {
 });
 
 dressupSuitcase.addEventListener("click", handleSuitcaseClick);
+dressupCharacterHotspot.addEventListener("click", () => {
+  if (dressupScene.classList.contains("is-visible") && currentOutfit === "pajama") {
+    showDressupDialogue("pajamaQuestion", 4600, 0);
+  }
+});
 bearCostumeHit.addEventListener("click", previewBearCostume);
 bearCostumeHit.addEventListener("pointerenter", () => {
   if (!bearCostumeWrap.classList.contains("is-previewing")) {

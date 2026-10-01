@@ -9,6 +9,7 @@ const returnButton = document.querySelector(".return-button");
 
 const copy = {
   en: {
+    talkCharacter: "Talk to Jongho",
     start: "START",
     bgm: "BGM",
     language: "LANGUAGE",
@@ -24,6 +25,7 @@ const copy = {
     off: "OFF",
   },
   zh: {
+    talkCharacter: "和钟浩说话",
     start: "开始",
     bgm: "音乐",
     language: "语言",
@@ -39,6 +41,7 @@ const copy = {
     off: "关闭",
   },
   ko: {
+    talkCharacter: "종호에게 말 걸기",
     start: "시작",
     bgm: "음악",
     language: "언어",
