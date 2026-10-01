@@ -11,6 +11,8 @@ const phoneCloseButton = document.querySelector(".phone-modal-close");
 const bedroomBgmButton = document.querySelector(".bedroom-bgm-toggle");
 const bedroomBackButton = document.querySelector(".bedroom-back-button");
 const sceneReturnMask = document.querySelector(".scene-return-mask");
+const wardrobeDoorHotspot = document.querySelector(".wardrobe-hotspot");
+const wardrobeClothesHotspot = document.querySelector(".wardrobe-clothes-hotspot");
 
 const bedroomOutfitSources = {
   cuteez: {
@@ -95,7 +97,6 @@ let lastAwakeLine = "";
 let currentBubbleKey = "";
 let bubbleHideTimer;
 let sceneTimers = [];
-let curtainHintStarted = false;
 let returnMaskTimer;
 let returnRevealTimer;
 
@@ -283,18 +284,27 @@ function applyBedroomOutfit(outfit) {
   bedroomScene.classList.add("has-dressed-character");
 }
 
-function toggleWardrobeDoor() {
-  if (window.orbitGameState.bedroomState !== "awake") return;
-  if (window.orbitGameState.wardrobeState === "open") {
-    bedroomScene.classList.remove("is-wardrobe-open");
-    window.orbitGameState.wardrobeState = "closed";
-    return;
-  }
-  openWardrobe();
+function updateWardrobeHotspots() {
+  const isOpen = window.orbitGameState.wardrobeState === "open";
+  wardrobeDoorHotspot.setAttribute("aria-label", isOpen ? "Close the wardrobe" : "Open the wardrobe");
+  wardrobeDoorHotspot.setAttribute("aria-expanded", String(isOpen));
+  wardrobeClothesHotspot.disabled = !isOpen;
+  wardrobeClothesHotspot.setAttribute("aria-hidden", String(!isOpen));
 }
 
-function openWardrobe() {
-  if (window.orbitGameState.bedroomState !== "awake") return;
+function toggleWardrobeDoor() {
+  if (window.orbitGameState.currentScene !== "bedroom" ||
+      window.orbitGameState.bedroomState !== "awake") return;
+  const isOpen = window.orbitGameState.wardrobeState !== "open";
+  window.orbitGameState.wardrobeState = isOpen ? "open" : "closed";
+  bedroomScene.classList.toggle("is-wardrobe-open", isOpen);
+  updateWardrobeHotspots();
+}
+
+function enterWardrobeDressup() {
+  if (window.orbitGameState.currentScene !== "bedroom" ||
+      window.orbitGameState.bedroomState !== "awake" ||
+      window.orbitGameState.wardrobeState !== "open") return;
   clearSceneTimers();
   stopAwakeMotion();
   setBedroomState("wardrobe");
@@ -303,26 +313,7 @@ function openWardrobe() {
   bedroomScene.classList.add("is-wardrobe-transitioning");
   window.prepareDressupScene?.();
 
-  if (window.orbitGameState.wardrobeState !== "open") {
-    window.orbitGameState.wardrobeState = "open";
-    bedroomScene.classList.add("is-wardrobe-open");
-
-    // 先让衣柜门完整打开，再开始推进镜头。
-    schedule(() => {
-      bedroomScene.classList.add("is-wardrobe-zooming");
-    }, 1050);
-
-    schedule(async () => {
-      const entered = await window.enterDressupScene?.();
-      if (entered === false) return;
-      schedule(() => {
-        bedroomScene.setAttribute("aria-hidden", "true");
-      }, 700);
-    }, 2180);
-    return;
-  }
-
-  // 衣柜已经打开时，不重复播放开门，只推进镜头。
+  // The door only toggles; clicking the clothes starts the existing zoom transition.
   requestAnimationFrame(() => {
     bedroomScene.classList.add("is-wardrobe-zooming");
   });
@@ -363,6 +354,7 @@ function handleRoomAction(event) {
   if (action === "character") handleCharacterClick();
   if (action === "phone") openPhone();
   if (action === "wardrobe") toggleWardrobeDoor();
+  if (action === "wardrobe-clothes") enterWardrobeDressup();
 
   if (action === "shake" || action === "dialogue" || action === "dialogue-only") {
     if (window.orbitGameState.bedroomState !== "awake") return;
@@ -388,7 +380,6 @@ function enterBedroomScene() {
   schedule(() => {
     if (window.orbitGameState.bedroomState !== "curtain") return;
     bedroomScene.classList.add("is-curtain-hint");
-    curtainHintStarted = true;
   }, 8000);
 }
 
@@ -425,6 +416,7 @@ function resetBedroomScene() {
   darkRoomVideo.currentTime = 0;
   setBedroomState("inactive");
   window.orbitGameState.wardrobeState = "closed";
+  updateWardrobeHotspots();
   bedroomOutfitCharacter.setAttribute("aria-hidden", "true");
   sleepClickCount = 0;
   lastAwakeLine = "";

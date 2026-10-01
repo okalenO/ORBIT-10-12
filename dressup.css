@@ -167,6 +167,12 @@
   pointer-events: auto;
 }
 
+.dressup-scene:not(.is-visible) .garment-hit,
+.dressup-scene:not(.is-visible) .dressup-suitcase-hotspot,
+.dressup-scene:not(.is-visible) .bear-costume-hit {
+  pointer-events: none;
+}
+
 .garment-hit:active {
   cursor: grabbing;
 }

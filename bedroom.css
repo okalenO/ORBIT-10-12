@@ -237,7 +237,7 @@
   height: 52%;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 480ms ease;
+  transition: opacity 2400ms ease-in-out;
   will-change: opacity;
 }
 
@@ -253,6 +253,7 @@
     0 0 1.1vw rgb(255 255 255 / 34%),
     0 0 2.4vw rgb(255 250 229 / 20%);
   content: "";
+  opacity: 0.18;
   filter: blur(0.32vw);
 }
 
@@ -265,7 +266,12 @@
 }
 
 .bedroom-scene.is-curtain-hint .curtain-glow {
-  animation: curtain-glow-pulse 4.4s ease-in-out infinite;
+  opacity: 1;
+}
+
+.bedroom-scene.is-curtain-hint .curtain-glow::before,
+.bedroom-scene.is-curtain-hint .curtain-glow::after {
+  animation: curtain-glow-pulse 6s ease-in-out infinite;
 }
 
 .curtain-left-open,
@@ -553,10 +559,31 @@
 }
 
 .wardrobe-hotspot {
-  top: 8.7%;
-  left: 80.7%;
-  width: 12%;
-  height: 67.3%;
+  top: 9.3883%;
+  left: 81.28%;
+  width: 10.2%;
+  height: 66.0028%;
+  clip-path: polygon(3% 6%, 96% 0, 100% 100%, 3% 96%);
+}
+
+.bedroom-scene.is-wardrobe-open .wardrobe-hotspot {
+  top: 10.6686%;
+  left: 74.28%;
+  width: 7.24%;
+  height: 64.2248%;
+  clip-path: polygon(3% 4%, 100% 0, 100% 100%, 3% 97%);
+}
+
+.wardrobe-clothes-hotspot {
+  top: 20.5%;
+  left: 83.5%;
+  width: 7.8%;
+  height: 30.8%;
+  visibility: hidden;
+}
+
+.bedroom-scene.is-wardrobe-open .wardrobe-clothes-hotspot {
+  visibility: visible;
 }
 
 .character-bubble {
@@ -935,6 +962,15 @@ html[lang="ko"] .character-bubble p {
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
   }
+
+  .bedroom-scene .curtain-glow {
+    transition-duration: 2400ms !important;
+  }
+
+  .bedroom-scene .curtain-glow::before,
+  .bedroom-scene .curtain-glow::after {
+    animation: none !important;
+  }
 }
 
 
@@ -943,14 +979,4 @@ html[lang="ko"] .character-bubble p {
   transform: translate(18%, 18%) scale(.76);
   transform-origin: 50% 90%;
 }
-.curtain-glow {
-  animation: curtainBreath 3.6s ease-in-out infinite;
-}
-@keyframes curtainBreath {
-  0%,100% { opacity:.15; }
-  50% { opacity:.42; }
-}
-
-.is-curtain-hint .curtain-glow { animation: curtainGlow 3.8s ease-in-out infinite; opacity:0.35; }
-@keyframes curtainGlow { 0%,100%{opacity:.2} 50%{opacity:.55} }
 .character-bubble p { white-space: pre-line; }
