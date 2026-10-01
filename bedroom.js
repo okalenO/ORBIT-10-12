@@ -30,6 +30,7 @@ const bedroomOutfitSources = {
 
 const bedroomCopy = {
   en: {
+    depart: "LET’S GO",
     sleepAgain: "Let me sleep a little longer…",
     alreadyAwake: "I’m already awake… zzZ",
     curtainWake: "It’s so bright… okay, okay, I’m getting up…",
@@ -44,6 +45,7 @@ const bedroomCopy = {
     pillow: "Should we sleep a little longer…? There’s still a lot to do today.",
   },
   zh: {
+    depart: "出发",
     sleepAgain: "再睡一会儿……",
     alreadyAwake: "我已经醒了……zzZ",
     curtainWake: "好亮……好啦，我起床啦……",
@@ -58,6 +60,7 @@ const bedroomCopy = {
     pillow: "要继续睡一会儿吗…？\n今天还有很多事要做呢。",
   },
   ko: {
+    depart: "출발",
     sleepAgain: "조금만 더 잘래…",
     alreadyAwake: "나 이미 깼어… zzZ",
     curtainWake: "너무 밝아… 알겠어, 이제 일어날게…",
@@ -106,7 +109,34 @@ let returnRevealTimer;
 const bedroomCharacterTiming = { play: 5400, wait: 6000 };
 let awakeMotionTimer;
 let awakeMotionToken = 0;
-let lunchInviteTimer;
+let characterHintTimer;
+let lunchInviteTriggered = false;
+const characterHint = document.querySelector(".bedroom-character-hint");
+const departButton = document.querySelector(".bedroom-depart-button");
+function hideDeparturePrompt() {
+  window.clearTimeout(characterHintTimer);
+  characterHint.classList.remove("is-visible");
+  departButton.classList.remove("is-visible");
+  departButton.disabled = true;
+  departButton.setAttribute("aria-hidden", "true");
+}
+function showDepartButton() {
+  departButton.textContent = textFor("depart");
+  departButton.disabled = false;
+  departButton.setAttribute("aria-hidden", "false");
+  departButton.classList.add("is-visible");
+}
+function startCharacterHint() {
+  hideDeparturePrompt();
+  if (!bedroomScene.classList.contains("has-dressed-character")) return;
+  if (lunchInviteTriggered) { showDepartButton(); return; }
+  characterHintTimer = window.setTimeout(() => {
+    if (window.orbitGameState.currentScene === "bedroom" &&
+        window.orbitGameState.bedroomState === "awake" && !lunchInviteTriggered) {
+      characterHint.classList.add("is-visible");
+    }
+  }, 8000);
+}
 
 function setBedroomState(nextState) {
   window.orbitGameState.bedroomState = nextState;
@@ -174,7 +204,6 @@ function hideBubble() {
 }
 
 function showDialogue(key, duration = 4400) {
-  window.clearTimeout(lunchInviteTimer);
   window.clearTimeout(bubbleHideTimer);
   bubble.classList.remove("is-visible");
   bubble.classList.add("is-resetting");
@@ -262,14 +291,9 @@ function handleCharacterClick() {
   if (window.orbitGameState.bedroomState === "awake") {
     if (bedroomScene.classList.contains("has-dressed-character")) {
       showDialogue("lunchInvite", 6500);
-      window.clearTimeout(lunchInviteTimer);
-      lunchInviteTimer = window.setTimeout(() => {
-        if (window.orbitGameState.currentScene !== "bedroom" ||
-            window.orbitGameState.bedroomState !== "awake") return;
-        window.dispatchEvent(new CustomEvent("orbit-next-scene-request", {
-          detail: { from: "bedroom", next: "lunch", outfit: window.orbitGameState.confirmedOutfit },
-        }));
-      }, 6500);
+      lunchInviteTriggered = true;
+      hideDeparturePrompt();
+      showDepartButton();
       return;
     }
     const options = ["specialDay", "awakeReally", "lookingFor"].filter(
@@ -295,6 +319,8 @@ function closePhone() {
 function applyBedroomOutfit(outfit) {
   const config = bedroomOutfitSources[outfit];
   if (!config) return;
+  lunchInviteTriggered = false;
+  hideDeparturePrompt();
   stopAwakeMotion();
   window.orbitGameState.characterState = "dressed";
   const [x, y, width, height] = config.geometry;
@@ -319,7 +345,6 @@ function toggleWardrobeDoor() {
   if (window.orbitGameState.currentScene !== "bedroom" ||
       window.orbitGameState.bedroomState !== "awake") return;
   const isOpen = window.orbitGameState.wardrobeState !== "open";
-  window.clearTimeout(lunchInviteTimer);
   window.orbitGameState.wardrobeState = isOpen ? "open" : "closed";
   bedroomScene.classList.toggle("is-wardrobe-open", isOpen);
   updateWardrobeHotspots();
@@ -330,7 +355,7 @@ function enterWardrobeDressup() {
       window.orbitGameState.bedroomState !== "awake" ||
       window.orbitGameState.wardrobeState !== "open") return;
   clearSceneTimers();
-  window.clearTimeout(lunchInviteTimer);
+  hideDeparturePrompt();
   stopAwakeMotion();
   setBedroomState("wardrobe");
   hideBubble();
@@ -367,6 +392,7 @@ function returnToBedroom() {
     bedroomScene.classList.remove("is-wardrobe-transitioning");
     setBedroomState("awake");
     scheduleAwakeMotion();
+    startCharacterHint();
   }, 1240);
 }
 
@@ -414,7 +440,7 @@ function updateBedroomBgm(enabled) {
 function returnToPreviousScene() {
   if (sceneReturnMask.classList.contains("is-active")) return;
   stopAwakeMotion();
-  window.clearTimeout(lunchInviteTimer);
+  hideDeparturePrompt();
   closePhone();
   hideBubble();
   sceneReturnMask.classList.add("is-active");
@@ -430,9 +456,10 @@ function returnToPreviousScene() {
 }
 
 function resetBedroomScene() {
+  lunchInviteTriggered = false;
   clearSceneTimers();
   stopAwakeMotion();
-  window.clearTimeout(lunchInviteTimer);
+  hideDeparturePrompt();
   closePhone();
   hideBubble();
   sceneClasses.forEach((className) => bedroomScene.classList.remove(className));
@@ -463,6 +490,7 @@ document.addEventListener("keydown", (event) => {
 
 window.addEventListener("orbit-language-change", (event) => {
   bedroomLanguage = event.detail.language;
+  departButton.textContent = textFor("depart");
   if (currentBubbleKey) bubbleText.textContent = textFor(currentBubbleKey);
 });
 
@@ -476,3 +504,13 @@ window.enterBedroomScene = enterBedroomScene;
 window.resetBedroomScene = resetBedroomScene;
 window.returnToBedroomFromDressup = returnToBedroom;
 window.applyBedroomOutfit = applyBedroomOutfit;
+
+departButton.addEventListener("click", () => {
+  if (!lunchInviteTriggered || departButton.disabled ||
+      window.orbitGameState.currentScene !== "bedroom" ||
+      window.orbitGameState.bedroomState !== "awake") return;
+  hideDeparturePrompt();
+  window.dispatchEvent(new CustomEvent("orbit-next-scene-request", {
+    detail: { from: "bedroom", next: "lunch", outfit: window.orbitGameState.confirmedOutfit },
+  }));
+});

@@ -1028,3 +1028,72 @@ html[lang="ko"] .character-bubble p {
 
 /* v2.6 fixes */
 .character-bubble p { white-space: pre-line; }
+
+/* Closed curtains and doors are already present in the corrected dark image. */
+.bedroom-scene:not(.is-curtains-open) .curtain-layer,
+.bedroom-scene:not(.is-curtains-open) .wardrobe-closed-layer,
+.bedroom-scene:not(.is-curtains-open) .wardrobe-open-layer { visibility: hidden; }
+.bedroom-character-hint {
+  position: absolute; left: 44.45%; top: 50%; z-index: 10;
+  transform: translateX(-50%); font-size: clamp(24px, 3vw, 56px);
+  pointer-events: none; opacity: 0; transition: opacity 1600ms ease;
+}
+.bedroom-character-hint.is-visible { opacity: 1; }
+.bedroom-character-hint.is-visible span {
+  display: block; animation: character-click-hint 5s ease-in-out infinite;
+}
+@keyframes character-click-hint {
+  0%, 100% { opacity: 0.25; } 50% { opacity: 1; }
+}
+.bedroom-scene .bedroom-depart-button {
+  left: 24%; right: auto; bottom: 10%; opacity: 0;
+  visibility: hidden; pointer-events: none;
+  transition: opacity 1600ms ease, visibility 0s 1600ms;
+}
+.bedroom-scene .bedroom-depart-button.is-visible {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transition: opacity 1600ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bedroom-character-hint span { animation: none !important; }
+}
+
+.bedroom-depart-button {
+  position: absolute;
+  z-index: 18;
+  right: 42%;
+  bottom: 8.2%;
+  min-width: clamp(92px, 9.2vw, 176px);
+  padding: clamp(7px, 0.7vw, 13px) clamp(14px, 1.6vw, 30px);
+  border: 2px solid currentColor;
+  border-radius: 999px 880px 960px 820px / 820px 960px 850px 990px;
+  background: rgb(255 250 240 / 82%);
+  color: var(--leaf-dark);
+  font-family: var(--font-hand-en);
+  font-size: clamp(15px, 1.35vw, 26px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 0.25vw 0.8vw rgb(70 48 33 / 15%);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    background-color 220ms ease;
+}
+
+html[lang="zh"] .bedroom-depart-button {
+  font-family: var(--font-hand-zh);
+}
+
+html[lang="ko"] .bedroom-depart-button {
+  font-family: var(--font-hand-ko);
+}
+
+.bedroom-depart-button:not(:disabled):hover,
+.bedroom-depart-button:not(:disabled):focus-visible {
+  background: rgb(245 250 224 / 96%);
+  transform: translateY(-3px) rotate(-0.8deg);
+}
+
+
+.bedroom-depart-button { color: var(--leaf); }
