@@ -1,5 +1,4 @@
 const bedroomScene = document.querySelector(".bedroom-scene");
-const darkRoomVideo = document.querySelector(".room-dark-video");
 const interactionLayer = document.querySelector(".interaction-layer");
 const bubble = document.querySelector(".character-bubble");
 const bubbleText = bubble.querySelector("p");
@@ -395,8 +394,6 @@ function enterBedroomScene() {
   setBedroomState("entering");
   bedroomScene.setAttribute("aria-hidden", "false");
   bedroomScene.classList.add("is-entering");
-  darkRoomVideo.currentTime = 0;
-  darkRoomVideo.play().catch(() => {});
 
   schedule(() => bedroomScene.classList.add("is-room-visible"), 1600);
   schedule(() => {
@@ -440,8 +437,6 @@ function resetBedroomScene() {
   hideBubble();
   sceneClasses.forEach((className) => bedroomScene.classList.remove(className));
   bedroomScene.setAttribute("aria-hidden", "true");
-  darkRoomVideo.pause();
-  darkRoomVideo.currentTime = 0;
   setBedroomState("inactive");
   window.orbitGameState.wardrobeState = "closed";
   updateWardrobeHotspots();

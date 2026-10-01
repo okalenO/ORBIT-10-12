@@ -130,10 +130,37 @@
   pointer-events: none;
 }
 
-.room-dark-video {
+.room-dark-bg {
   z-index: 0;
   opacity: 1;
   transition: opacity 2800ms ease;
+}
+
+/* Reuse a feathered local crop of the same PNG; the rest of the room stays still. */
+.dark-sleeping-breath {
+  position: absolute;
+  z-index: 0;
+  left: 23.68%;
+  top: 46.5861%;
+  width: 16.92%;
+  height: 16.7852%;
+  background-image: url("assets/bedroom/bedroom-dark.png");
+  background-size: 591.01655% 595.76338%;
+  background-position: 28.50265% 55.98309%;
+  mask-image: radial-gradient(ellipse at 43% 48%, #000 48%, transparent 74%);
+  transform-origin: 43% 86%;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 2800ms ease;
+}
+
+.bedroom-scene.is-room-visible:not(.is-curtains-open) .dark-sleeping-breath {
+  animation: dark-sleep-breathe 5.6s ease-in-out infinite;
+}
+
+@keyframes dark-sleep-breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-0.25px) scaleY(1.008); }
 }
 
 .room-light-bg {
@@ -181,6 +208,7 @@
 }
 
 .humidifier-layer {
+  z-index: 9;
   transform-origin: 49.54% 94.28%;
 }
 
@@ -347,7 +375,8 @@
   transition: opacity 2600ms ease;
 }
 
-.bedroom-scene.is-curtains-open .room-dark-video {
+.bedroom-scene.is-curtains-open .room-dark-bg,
+.bedroom-scene.is-curtains-open .dark-sleeping-breath {
   opacity: 0;
 }
 
@@ -494,10 +523,12 @@
 }
 
 .bedroom-scene.is-awake .character-hotspot {
-  top: 46%;
-  left: 28%;
-  width: 9%;
-  height: 18%;
+  top: 45.5176%;
+  left: 25.375%;
+  width: 11.3021%;
+  height: 22.963%;
+  z-index: 1;
+  clip-path: polygon(15% 0, 70% 0, 100% 25%, 90% 50%, 65% 61%, 70% 94%, 50% 100%, 30% 94%, 20% 66%, 0 45%, 0 24%);
 }
 
 .bedroom-scene.has-dressed-character .character-hotspot {
@@ -506,13 +537,15 @@
   width: 15.3%;
   height: 32.4%;
   z-index: 1;
+  clip-path: none;
 }
 
 .pillow-hotspot {
-  top: 41%;
-  left: 23%;
-  width: 9%;
-  height: 10%;
+  top: 43.5%;
+  left: 14.4%;
+  width: 20.6%;
+  height: 17.5%;
+  clip-path: polygon(0 35%, 15% 31%, 16% 15%, 53% 9%, 52% 3%, 89% 0, 100% 69%, 83% 86%, 56% 89%, 25% 100%, 8% 93%);
 }
 
 .poster-hotspot {
@@ -551,10 +584,12 @@
 }
 
 .humidifier-hotspot {
-  top: 81.8%;
-  left: 45.6%;
-  width: 9.5%;
-  height: 18.2%;
+  top: 82.5036%;
+  left: 46%;
+  width: 8.68%;
+  height: 17.4964%;
+  z-index: 2;
+  clip-path: polygon(38% 0, 48% 0, 54% 5%, 56% 10%, 65% 15%, 67% 20%, 66% 25%, 60% 30%, 59% 35%, 63% 40%, 56% 45%, 61% 50%, 66% 60%, 70% 70%, 71% 80%, 72% 90%, 69% 100%, 4% 100%, 1% 90%, 2% 80%, 4% 70%, 7% 60%, 13% 50%, 19% 45%, 31% 40%, 35% 35%, 33% 30%, 24% 25%, 22% 20%, 26% 15%, 28% 10%, 30% 5%);
 }
 
 .computer-hotspot {
@@ -978,6 +1013,10 @@ html[lang="ko"] .character-bubble p {
 
   .bedroom-scene .curtain-glow {
     transition-duration: 2400ms !important;
+  }
+
+  .bedroom-scene .dark-sleeping-breath {
+    animation: none !important;
   }
 
   .bedroom-scene .curtain-glow::before,
