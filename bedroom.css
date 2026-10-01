@@ -383,11 +383,19 @@
   opacity: 1;
 }
 
-.bedroom-scene.is-awake .character-sit-up {
+.bedroom-scene.is-awake.is-awake-motion .character-sit-up {
   opacity: 1;
 }
 
-.bedroom-scene.is-awake .character-awake {
+.bedroom-scene.is-awake:not(.is-awake-motion) .character-sit-up {
+  opacity: 0;
+}
+
+.bedroom-scene.is-awake:not(.has-dressed-character) .character-awake {
+  opacity: 1;
+}
+
+.bedroom-scene.is-awake.is-awake-motion .character-awake {
   opacity: 0;
 }
 

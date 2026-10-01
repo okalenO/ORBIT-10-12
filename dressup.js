@@ -11,7 +11,6 @@ const bearCostumeWrap = document.querySelector(".bear-costume-wrap");
 const bearCostumeHit = document.querySelector(".bear-costume-hit");
 const dressupConfirmButton = document.querySelector(".dressup-confirm-button");
 const garmentSlots = [...document.querySelectorAll(".garment-slot")];
-let outfitPreviewConfirmed = null;
 
 // 使用两个角色图层交叉切换：新素材会先在不可见图层完成加载，
 // 再与旧素材交叉淡入淡出，从根本上避免更换 src 时的白闪。
@@ -66,13 +65,7 @@ const dressupCopy = {
   },
 };
 
-const outfitState = window.orbitGameState || {
-  selectedOutfit: null,
-  confirmedOutfit: null,
-  previewOutfit: null,
-  bearUnlocked: false,
-};
-window.orbitGameState = outfitState;
+const outfitState = window.orbitGameState;
 
 const slotMotion = garmentSlots.map((slot, index) => ({
   slot,
@@ -268,22 +261,24 @@ function schedulePajamaMotion() {
 
   const wait = 4200 + Math.random() * 2300;
   pajamaWaitTimer = window.setTimeout(async () => {
-    if (currentOutfit !== "pajama") return;
-    await crossfadeCharacterSource(dressupCharacterSources.pajamaGif, {
+    const entryToken = sceneEntryToken;
+    if (currentOutfit !== "pajama" || !dressupScene.classList.contains("is-visible")) return;
+    const changed = await crossfadeCharacterSource(dressupCharacterSources.pajamaGif, {
       duration: 160,
       outgoingDuration: 160,
       restart: true,
       subtle: true,
     });
-    if (currentOutfit !== "pajama") return;
+    if (!changed || entryToken !== sceneEntryToken || currentOutfit !== "pajama") return;
     pajamaPlayTimer = window.setTimeout(async () => {
-      if (currentOutfit !== "pajama") return;
+      if (entryToken !== sceneEntryToken || currentOutfit !== "pajama" ||
+          !dressupScene.classList.contains("is-visible")) return;
       await crossfadeCharacterSource(dressupCharacterSources.pajamaStill, {
         duration: 180,
         outgoingDuration: 180,
         subtle: true,
       });
-      schedulePajamaMotion();
+      if (entryToken === sceneEntryToken) schedulePajamaMotion();
     }, 2320);
   }, wait);
 }
@@ -305,6 +300,7 @@ function playCharacterSwap(outfit) {
 }
 
 function chooseNormalOutfit(outfit) {
+  if (!dressupScene.classList.contains("is-visible")) return;
   const nextSlot = garmentSlots.find((slot) => slot.dataset.outfit === outfit);
   if (!nextSlot || nextSlot.classList.contains("is-selected")) return;
 
@@ -322,6 +318,7 @@ function chooseNormalOutfit(outfit) {
 }
 
 function previewBearCostume() {
+  if (!dressupScene.classList.contains("is-visible")) return;
   if (!bearCostumeWrap.classList.contains("is-unlocked")) return;
   if (selectedSlot) selectedSlot.classList.remove("is-selected");
   selectedSlot = null;
@@ -340,6 +337,7 @@ function revealBearCostume() {
 }
 
 function confirmDressupSelection() {
+  if (!dressupScene.classList.contains("is-visible")) return;
   if (dressupConfirmButton.disabled) return;
   const outfit = outfitState.selectedOutfit;
   if (!["cuteez", "plaid", "henley"].includes(outfit) || currentOutfit === "bear") return;
@@ -350,6 +348,7 @@ function confirmDressupSelection() {
 }
 
 function handleSuitcaseClick() {
+  if (!dressupScene.classList.contains("is-visible")) return;
   if (outfitState.bearUnlocked) return;
   suitcaseClicks += 1;
   dressupSuitcase.classList.remove("is-tapped");
@@ -371,6 +370,16 @@ function releaseGarments() {
   slotMotion.forEach((state) => {
     state.target = 0;
   });
+}
+
+function clearActiveGarmentDrag() {
+  if (activeDrag) {
+    const hit = activeDrag.state.slot.querySelector(".garment-hit");
+    const pointerId = activeDrag.pointerId;
+    activeDrag = null;
+    if (hit.hasPointerCapture(pointerId)) hit.releasePointerCapture(pointerId);
+  }
+  releaseGarments();
 }
 
 function beginGarmentDrag(event, state) {
@@ -461,6 +470,7 @@ function updateDressupBgm(enabled) {
 }
 
 function resetDressupState({ clearProgress = false } = {}) {
+  clearActiveGarmentDrag();
   window.clearTimeout(dialogueTimer);
   window.clearTimeout(dialogueShowTimer);
   window.clearTimeout(sparkleTimer);
@@ -498,6 +508,7 @@ async function enterDressupScene() {
   await prepareDressupScene();
   if (token !== sceneEntryToken) return false;
   resetDressupState();
+  outfitState.currentScene = "dressup";
   dressupScene.setAttribute("aria-hidden", "false");
   document.querySelector(".stage").classList.add("is-dressup");
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -510,6 +521,11 @@ async function enterDressupScene() {
 
 function exitDressupScene() {
   sceneEntryToken += 1;
+  characterSwapToken += 1;
+  cancelCharacterAnimations();
+  clearActiveGarmentDrag();
+  window.clearTimeout(dialogueTimer);
+  window.clearTimeout(sparkleTimer);
   clearPajamaTimers();
   hideDressupDialogue();
   dressupScene.classList.remove("is-visible");
@@ -576,4 +592,4 @@ window.resetDressupScene = resetDressupScene;
 
 
 // v2.6 state synchronization helpers
-window.getDressupConfirmedOutfit = () => outfitPreviewConfirmed;
+window.getDressupConfirmedOutfit = () => outfitState.confirmedOutfit;

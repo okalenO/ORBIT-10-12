@@ -82,6 +82,7 @@ const sceneClasses = [
   "is-waking",
   "is-phone-visible",
   "is-awake",
+  "is-awake-motion",
   "is-wardrobe-open",
   "is-wardrobe-zooming",
   "is-wardrobe-transitioning",
@@ -89,16 +90,51 @@ const sceneClasses = [
 ];
 
 let bedroomLanguage = window.orbitMenu?.getLanguage?.() || "en";
-let bedroomState = "inactive";
 let sleepClickCount = 0;
 let lastAwakeLine = "";
 let currentBubbleKey = "";
-let wardrobeWasOpened = false;
 let bubbleHideTimer;
 let sceneTimers = [];
 let curtainHintStarted = false;
 let returnMaskTimer;
 let returnRevealTimer;
+
+// GIF metadata: 5 frames, 5400 ms per cycle. Keep the original interaction timings.
+const bedroomCharacterTiming = { play: 5400, wait: 6000 };
+let awakeMotionTimer;
+
+function setBedroomState(nextState) {
+  window.orbitGameState.bedroomState = nextState;
+  const characterPhases = {
+    inactive: "sleeping", entering: "sleeping", curtain: "sleeping",
+    openingCurtains: "sleeping", sleepClicks: "sleeping",
+    wakeQueued: "wakeQueued", waking: "waking",
+    awake: window.orbitGameState.confirmedOutfit ? "dressed" : "awake",
+  };
+  if (characterPhases[nextState]) {
+    window.orbitGameState.characterState = characterPhases[nextState];
+  }
+}
+
+function stopAwakeMotion() {
+  window.clearTimeout(awakeMotionTimer);
+  bedroomScene.classList.remove("is-awake-motion");
+}
+
+function scheduleAwakeMotion() {
+  stopAwakeMotion();
+  const canPlay = () => window.orbitGameState.currentScene === "bedroom" &&
+    window.orbitGameState.bedroomState === "awake" &&
+    !window.orbitGameState.confirmedOutfit;
+  if (!canPlay()) return;
+  awakeMotionTimer = window.setTimeout(() => {
+    if (!canPlay()) return;
+    const src = sitUpCharacter.getAttribute("src").split("?")[0];
+    sitUpCharacter.setAttribute("src", `${src}?play=${Date.now()}`);
+    bedroomScene.classList.add("is-awake-motion");
+    awakeMotionTimer = window.setTimeout(scheduleAwakeMotion, bedroomCharacterTiming.play);
+  }, bedroomCharacterTiming.wait);
+}
 
 function schedule(callback, delay) {
   const timer = window.setTimeout(callback, delay);
@@ -146,20 +182,20 @@ function shakeLayer(className) {
 }
 
 function openCurtains() {
-  if (bedroomState !== "curtain") return;
-  bedroomState = "openingCurtains";
+  if (window.orbitGameState.bedroomState !== "curtain") return;
+  setBedroomState("openingCurtains");
   bedroomScene.classList.remove("is-curtain-ready", "is-curtain-hint");
   bedroomScene.classList.add("is-curtains-open");
   schedule(() => bedroomScene.classList.add("is-light-on"), 900);
   schedule(() => {
     bedroomScene.classList.add("is-sleep-interactive");
-    bedroomState = "sleepClicks";
+    setBedroomState("sleepClicks");
   }, 2600);
 }
 
 function beginWakeAnimation() {
-  if (bedroomState !== "wakeQueued") return;
-  bedroomState = "waking";
+  if (window.orbitGameState.bedroomState !== "wakeQueued") return;
+  setBedroomState("waking");
   bedroomScene.classList.remove("is-wake-queued", "is-sleep-interactive");
   bedroomScene.classList.add("is-waking");
   bubble.dataset.anchor = "awake";
@@ -169,21 +205,23 @@ function beginWakeAnimation() {
 
   // Let the phone enter while the sit-up animation is still playing.
   schedule(() => {
-    if (bedroomState === "waking") {
+    if (window.orbitGameState.bedroomState === "waking") {
       bedroomScene.classList.add("is-phone-visible");
     }
   }, 900);
 
-  // Open the awake interactions after the entrance beat while keeping the GIF looping.
+  // Restore interaction at the original time; finish the GIF before showing its still frame.
   schedule(() => {
     bedroomScene.classList.add("is-awake");
     bedroomScene.classList.remove("is-waking");
-    bedroomState = "awake";
+    setBedroomState("awake");
   }, 5000);
+  bedroomScene.classList.add("is-awake-motion");
+  awakeMotionTimer = window.setTimeout(scheduleAwakeMotion, bedroomCharacterTiming.play);
 }
 
 function handleCharacterClick() {
-  if (bedroomState === "sleepClicks") {
+  if (window.orbitGameState.bedroomState === "sleepClicks") {
     sleepClickCount += 1;
 
     if (sleepClickCount === 1) {
@@ -197,7 +235,7 @@ function handleCharacterClick() {
     }
 
     if (sleepClickCount === 3) {
-      bedroomState = "wakeQueued";
+      setBedroomState("wakeQueued");
       bedroomScene.classList.add("is-wake-queued");
       showDialogue("curtainWake", 5000);
       schedule(beginWakeAnimation, 2400);
@@ -205,7 +243,7 @@ function handleCharacterClick() {
     return;
   }
 
-  if (bedroomState === "awake") {
+  if (window.orbitGameState.bedroomState === "awake") {
     if (bedroomScene.classList.contains("has-dressed-character")) {
       showDialogue("specialDay");
       return;
@@ -219,7 +257,7 @@ function handleCharacterClick() {
 }
 
 function openPhone() {
-  if (bedroomState !== "awake") return;
+  if (window.orbitGameState.bedroomState !== "awake") return;
   phoneModal.classList.add("is-open");
   phoneModal.setAttribute("aria-hidden", "false");
   phoneCloseButton.focus();
@@ -233,6 +271,8 @@ function closePhone() {
 function applyBedroomOutfit(outfit) {
   const config = bedroomOutfitSources[outfit];
   if (!config) return;
+  stopAwakeMotion();
+  window.orbitGameState.characterState = "dressed";
   const [x, y, width, height] = config.geometry;
   bedroomOutfitImage.src = config.src;
   bedroomOutfitCharacter.style.setProperty("--sprite-x", `${x}%`);
@@ -244,26 +284,27 @@ function applyBedroomOutfit(outfit) {
 }
 
 function toggleWardrobeDoor() {
-  if (bedroomState !== "awake") return;
-  if (bedroomScene.classList.contains("is-wardrobe-open")) {
+  if (window.orbitGameState.bedroomState !== "awake") return;
+  if (window.orbitGameState.wardrobeState === "open") {
     bedroomScene.classList.remove("is-wardrobe-open");
-    wardrobeWasOpened = false;
+    window.orbitGameState.wardrobeState = "closed";
     return;
   }
   openWardrobe();
 }
 
 function openWardrobe() {
-  if (bedroomState !== "awake") return;
+  if (window.orbitGameState.bedroomState !== "awake") return;
   clearSceneTimers();
-  bedroomState = "wardrobe";
+  stopAwakeMotion();
+  setBedroomState("wardrobe");
   hideBubble();
   closePhone();
   bedroomScene.classList.add("is-wardrobe-transitioning");
   window.prepareDressupScene?.();
 
-  if (!wardrobeWasOpened) {
-    wardrobeWasOpened = true;
+  if (window.orbitGameState.wardrobeState !== "open") {
+    window.orbitGameState.wardrobeState = "open";
     bedroomScene.classList.add("is-wardrobe-open");
 
     // 先让衣柜门完整打开，再开始推进镜头。
@@ -297,8 +338,9 @@ function openWardrobe() {
 function returnToBedroom() {
   clearSceneTimers();
   window.exitDressupScene?.();
+  window.orbitGameState.currentScene = "bedroom";
   bedroomScene.setAttribute("aria-hidden", "false");
-  bedroomState = "returning";
+  setBedroomState("returning");
 
   requestAnimationFrame(() => {
     bedroomScene.classList.remove("is-wardrobe-zooming");
@@ -307,7 +349,8 @@ function returnToBedroom() {
   // 等镜头完全退回后再恢复热点；衣柜门保持打开。
   schedule(() => {
     bedroomScene.classList.remove("is-wardrobe-transitioning");
-    bedroomState = "awake";
+    setBedroomState("awake");
+    scheduleAwakeMotion();
   }, 1240);
 }
 
@@ -322,7 +365,7 @@ function handleRoomAction(event) {
   if (action === "wardrobe") toggleWardrobeDoor();
 
   if (action === "shake" || action === "dialogue" || action === "dialogue-only") {
-    if (bedroomState !== "awake") return;
+    if (window.orbitGameState.bedroomState !== "awake") return;
     if (action !== "dialogue-only") shakeLayer(hotspot.dataset.layer);
     if (action !== "shake") showDialogue(hotspot.dataset.copy);
   }
@@ -330,7 +373,8 @@ function handleRoomAction(event) {
 
 function enterBedroomScene() {
   resetBedroomScene();
-  bedroomState = "entering";
+  window.orbitGameState.currentScene = "bedroom";
+  setBedroomState("entering");
   bedroomScene.setAttribute("aria-hidden", "false");
   bedroomScene.classList.add("is-entering");
   darkRoomVideo.currentTime = 0;
@@ -339,10 +383,10 @@ function enterBedroomScene() {
   schedule(() => bedroomScene.classList.add("is-room-visible"), 1600);
   schedule(() => {
     bedroomScene.classList.add("is-room-ready", "is-curtain-ready");
-    bedroomState = "curtain";
+    setBedroomState("curtain");
   }, 2900);
   schedule(() => {
-    if (bedroomState !== "curtain") return;
+    if (window.orbitGameState.bedroomState !== "curtain") return;
     bedroomScene.classList.add("is-curtain-hint");
     curtainHintStarted = true;
   }, 8000);
@@ -355,6 +399,7 @@ function updateBedroomBgm(enabled) {
 
 function returnToPreviousScene() {
   if (sceneReturnMask.classList.contains("is-active")) return;
+  stopAwakeMotion();
   closePhone();
   hideBubble();
   sceneReturnMask.classList.add("is-active");
@@ -371,14 +416,15 @@ function returnToPreviousScene() {
 
 function resetBedroomScene() {
   clearSceneTimers();
+  stopAwakeMotion();
   closePhone();
   hideBubble();
   sceneClasses.forEach((className) => bedroomScene.classList.remove(className));
   bedroomScene.setAttribute("aria-hidden", "true");
   darkRoomVideo.pause();
   darkRoomVideo.currentTime = 0;
-  bedroomState = "inactive";
-  wardrobeWasOpened = false;
+  setBedroomState("inactive");
+  window.orbitGameState.wardrobeState = "closed";
   bedroomOutfitCharacter.setAttribute("aria-hidden", "true");
   sleepClickCount = 0;
   lastAwakeLine = "";

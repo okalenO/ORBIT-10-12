@@ -267,6 +267,10 @@
   cursor: pointer;
 }
 
+.bear-costume-wrap:not(.is-unlocked) .bear-costume-hit {
+  pointer-events: none;
+}
+
 .bear-costume-wrap.is-unlocked:not(.is-previewing).is-hovered .hidden-bear-costume,
 .bear-costume-wrap.is-unlocked:not(.is-previewing):focus-within .hidden-bear-costume {
   filter:

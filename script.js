@@ -105,6 +105,7 @@ function resetMenu() {
   window.clearTimeout(transitionTimer);
   window.resetDressupScene?.();
   window.resetBedroomScene?.();
+  window.orbitGameState.currentScene = "menu";
   stage.classList.remove("is-bedroom", "is-transitioning", "is-dressup");
 }
 
