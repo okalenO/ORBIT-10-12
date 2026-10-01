@@ -1,0 +1,426 @@
+@font-face {
+  font-family: "WaWa";
+  src: url("assets/Fonts/DFPWaWaW5-GB.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SoodaGongju";
+  src: url("assets/Fonts/YDSoodagongju.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink: #472817;
+  --leaf: #6a9029;
+  --leaf-dark: #4f741d;
+  --paper: #f6efe0;
+  --paper-bright: #fffaf0;
+  --focus: #e9b42f;
+  --font-hand-en: "WaWa", "Bradley Hand ITC", "Lucida Handwriting",
+    "Comic Sans MS", cursive;
+  --font-hand-zh: "WaWa", "FZKai-Z03", "KaiTi", "Kaiti SC",
+    "Microsoft YaHei UI", cursive;
+  --font-hand-ko: "SoodaGongju", "Nanum Brush Script", "UhBee MiMi",
+    "KCC-Ganpan", "Malgun Gothic", cursive;
+  --font-ui: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC",
+    "Malgun Gothic", "Noto Sans KR", sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #1f1711;
+}
+
+button {
+  font: inherit;
+}
+
+.viewport {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--paper);
+  box-shadow: 0 0 48px rgb(0 0 0 / 24%);
+}
+
+.layer,
+.decorations {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.layer {
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.background {
+  z-index: 0;
+}
+
+.decorations {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.shape {
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+  transition:
+    transform 760ms cubic-bezier(0.55, 0.02, 0.42, 0.98),
+    opacity 580ms ease,
+    filter 580ms ease;
+}
+
+.title-art {
+  z-index: 4;
+  animation: title-float 4.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.menu-actions {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.sketch-button {
+  position: absolute;
+  min-width: max-content;
+  padding: 0.12em 0.25em 0.14em;
+  border: 0;
+  border-bottom: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-hand-en);
+  font-size: clamp(17px, 2.2vw, 44px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transform-origin: center;
+  text-shadow: 0.025em 0.035em 0 rgb(255 255 255 / 52%);
+  transition:
+    color 180ms ease,
+    transform 180ms ease,
+    opacity 360ms ease;
+}
+
+html[lang="zh"] .sketch-button {
+  font-family: var(--font-hand-zh);
+  font-size: clamp(18px, 2.05vw, 41px);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+html[lang="ko"] .sketch-button {
+  font-family: var(--font-hand-ko);
+  font-size: clamp(18px, 2vw, 40px);
+  font-weight: 400;
+  letter-spacing: 0.055em;
+}
+
+.sketch-button::before,
+.sketch-button::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.27em;
+  left: 0;
+  height: 0.26em;
+  content: "";
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform-origin: center;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.sketch-button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C15 3 27 9 41 6 S67 9 81 5 S106 8 118 5' fill='none' stroke='%23472817' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M4 9 C26 7 46 10 68 8 S101 10 116 7' fill='none' stroke='%23472817' stroke-opacity='.28' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.sketch-button::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C15 2 29 10 43 6 S70 9 84 4 S107 8 118 5' fill='none' stroke='%236A9029' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  opacity: 0;
+  transform: translateX(-0.12em) rotate(-0.4deg);
+}
+
+.sketch-button:hover,
+.sketch-button:focus-visible {
+  color: var(--leaf-dark);
+  transform: translateY(-0.09em) rotate(-0.35deg);
+}
+
+.sketch-button:hover::after,
+.sketch-button:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0.04em) rotate(0.25deg);
+}
+
+.sketch-button:focus-visible,
+.language-menu button:focus-visible,
+.return-button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 5px;
+}
+
+.sketch-button:active {
+  transform: translateY(0.02em) scale(0.97);
+}
+
+.start-button {
+  top: 49.6%;
+  left: 9.7%;
+}
+
+.bgm-button {
+  top: 64.7%;
+  left: 10.8%;
+}
+
+.bgm-state {
+  display: inline-block;
+  min-width: 3.2ch;
+  color: var(--leaf-dark);
+  text-align: left;
+}
+
+.language-control {
+  position: absolute;
+  top: 79.7%;
+  left: 6.8%;
+  pointer-events: auto;
+  transition:
+    transform 360ms ease,
+    opacity 360ms ease;
+}
+
+.language-control .language-button {
+  position: relative;
+}
+
+.language-menu {
+  position: absolute;
+  bottom: calc(100% + 0.9rem);
+  left: 0;
+  display: grid;
+  min-width: 10rem;
+  padding: 0.55rem;
+  border: 1px solid rgb(71 40 23 / 25%);
+  border-radius: 2px;
+  background: rgb(255 250 240 / 94%);
+  box-shadow: 0 12px 34px rgb(71 40 23 / 18%);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  backdrop-filter: blur(7px);
+}
+
+.language-control.is-open .language-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.language-menu button {
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: clamp(13px, 1vw, 18px);
+  text-align: left;
+  cursor: pointer;
+}
+
+.language-menu button:hover {
+  background: rgb(106 144 41 / 12%);
+  color: var(--leaf-dark);
+}
+
+.warm-light {
+  position: absolute;
+  z-index: 8;
+  top: 49%;
+  left: 52%;
+  width: 20vmax;
+  height: 20vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(255 253 246 / 100%) 0%,
+    rgb(255 249 235 / 98%) 42%,
+    rgb(246 239 224 / 76%) 68%,
+    rgb(246 239 224 / 0%) 100%
+  );
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.08);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.return-button {
+  justify-self: center;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+.stage.is-transitioning .shape-1 {
+  opacity: 0;
+  transform: translate(-10vw, 16vh) rotate(-7deg) scale(0.96);
+  filter: blur(2px);
+}
+
+.stage.is-transitioning .shape-2 {
+  opacity: 0;
+  transform: translate(-12vw, -13vh) rotate(-5deg) scale(0.95);
+  filter: blur(2px);
+}
+
+.stage.is-transitioning .shape-3 {
+  opacity: 0;
+  transform: translate(1vw, -17vh) rotate(5deg) scale(0.96);
+  filter: blur(2px);
+}
+
+.stage.is-transitioning .shape-4 {
+  opacity: 0;
+  transform: translate(13vw, -11vh) rotate(6deg) scale(0.95);
+  filter: blur(2px);
+}
+
+.stage.is-transitioning .sketch-button,
+.stage.is-transitioning .language-menu {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage.is-transitioning .start-button,
+.stage.is-transitioning .bgm-button,
+.stage.is-transitioning .language-control {
+  transform: translateX(-5vw);
+}
+
+.stage.is-transitioning .warm-light {
+  animation: light-bloom 1.55s 420ms cubic-bezier(0.33, 0.02, 0.2, 1) forwards;
+}
+
+.rotate-notice {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: none;
+  place-content: center;
+  gap: 0.7rem;
+  padding: 2rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  text-align: center;
+}
+
+.rotate-notice strong {
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+}
+
+.rotate-notice span:last-child {
+  color: rgb(71 40 23 / 68%);
+  font-size: 0.9rem;
+}
+
+.rotate-icon {
+  color: var(--leaf-dark);
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+@keyframes title-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.48%);
+  }
+}
+
+@keyframes light-bloom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.08);
+  }
+  18% {
+    opacity: 0.78;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(10);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+  .rotate-notice {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-art {
+    animation: none;
+  }
+
+  .shape,
+  .sketch-button,
+  .language-menu {
+    transition-duration: 1ms;
+  }
+
+  .stage.is-transitioning .warm-light {
+    animation-duration: 1ms;
+    animation-delay: 1ms;
+  }
+}

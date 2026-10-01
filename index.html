@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6efe0" />
+    <title>ORBIT 10:12 — Menu Graybox</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="bedroom.css" />
+    <link rel="stylesheet" href="dressup.css" />
+  </head>
+  <body>
+    <main class="viewport">
+      <section class="stage" id="menuStage" aria-label="ORBIT 10:12 main menu">
+        <img class="layer background" src="assets/menu-bg.gif" alt="" draggable="false" />
+
+        <div class="decorations" aria-hidden="true">
+          <img class="layer shape shape-1" src="assets/menu-shape-01.png" alt="" draggable="false" />
+          <img class="layer shape shape-2" src="assets/menu-shape-02.png" alt="" draggable="false" />
+          <img class="layer shape shape-3" src="assets/menu-shape-03.png" alt="" draggable="false" />
+          <img class="layer shape shape-4" src="assets/menu-shape-04.png" alt="" draggable="false" />
+        </div>
+
+        <img class="layer title-art" src="assets/menu-title.png" alt="ORBIT 10:12" draggable="false" />
+
+        <nav class="menu-actions" aria-label="Main menu">
+          <button class="sketch-button start-button" type="button" data-i18n="start">
+            START
+          </button>
+
+          <button class="sketch-button bgm-button" type="button" aria-pressed="true">
+            <span data-i18n="bgm">BGM</span>
+            <span class="bgm-state">ON</span>
+          </button>
+
+          <div class="language-control">
+            <button
+              class="sketch-button language-button"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              data-i18n="language"
+            >
+              LANGUAGE
+            </button>
+            <div class="language-menu" role="menu" aria-label="Language">
+              <button type="button" role="menuitem" data-lang="zh">简体中文</button>
+              <button type="button" role="menuitem" data-lang="ko">한국어</button>
+              <button type="button" role="menuitem" data-lang="en">English</button>
+            </div>
+          </div>
+        </nav>
+
+        <div class="warm-light" aria-hidden="true"></div>
+
+        <section class="bedroom-scene" aria-hidden="true">
+          <div class="bedroom-intro" aria-hidden="true">
+            <p class="bedroom-intro-time">10:12</p>
+            <p class="bedroom-intro-label" data-i18n="bedroom">BEDROOM</p>
+          </div>
+
+          <div class="room-canvas">
+            <video
+              class="room-media room-dark-video"
+              muted
+              loop
+              playsinline
+              preload="auto"
+              poster="assets/bedroom/bedroom-dark-poster.webp"
+            >
+              <source src="assets/bedroom/bedroom-dark.mp4" type="video/mp4" />
+            </video>
+
+            <img class="room-media room-light-bg" src="assets/bedroom/bedroom-light.png" alt="" draggable="false" />
+
+            <div class="room-sprite-layer bright-layer poster-layer" style="--sprite-x:6.32%;--sprite-y:1.707%;--sprite-w:15.84%;--sprite-h:37.8378%"><img src="assets/bedroom/trim/poster.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer plush-01-layer" style="--sprite-x:4%;--sprite-y:50.1422%;--sprite-w:6.32%;--sprite-h:12.0199%"><img src="assets/bedroom/trim/plush-01.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer plush-02-layer" style="--sprite-x:36.24%;--sprite-y:47.6529%;--sprite-w:5.6%;--sprite-h:8.606%"><img src="assets/bedroom/trim/plush-02.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer soccer-layer" style="--sprite-x:7.16%;--sprite-y:80.0853%;--sprite-w:7.68%;--sprite-h:13.6558%"><img src="assets/bedroom/trim/soccer-ball.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer suitcase-layer" style="--sprite-x:52.56%;--sprite-y:48.7198%;--sprite-w:21.44%;--sprite-h:35.9175%"><img src="assets/bedroom/trim/suitcase.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer humidifier-layer" style="--sprite-x:46%;--sprite-y:82.5036%;--sprite-w:8.68%;--sprite-h:17.4964%"><img src="assets/bedroom/trim/humidifier.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer computer-layer" style="--sprite-x:86.48%;--sprite-y:51.2091%;--sprite-w:13.52%;--sprite-h:47.5818%"><img src="assets/bedroom/trim/computer.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer phone-layer" style="--sprite-x:33.68%;--sprite-y:64.1536%;--sprite-w:3.8%;--sprite-h:7.2546%"><img src="assets/bedroom/trim/phone.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer wardrobe-closed-layer" style="--sprite-x:81.28%;--sprite-y:9.3883%;--sprite-w:10.2%;--sprite-h:66.0028%"><img src="assets/bedroom/trim/wardrobe-door-closed.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer wardrobe-open-layer" style="--sprite-x:74.28%;--sprite-y:10.6686%;--sprite-w:7.24%;--sprite-h:64.2248%"><img src="assets/bedroom/trim/wardrobe-door-open.png" alt="" draggable="false" /></div>
+
+            <div class="curtain-glow" aria-hidden="true"></div>
+            <div class="room-sprite-layer curtain-layer curtain-left-closed" style="--sprite-x:44.32%;--sprite-y:7.2546%;--sprite-w:10.72%;--sprite-h:43.5989%"><img src="assets/bedroom/trim/curtain-left-closed.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer curtain-layer curtain-right-closed" style="--sprite-x:54.16%;--sprite-y:4.8364%;--sprite-w:13.08%;--sprite-h:47.6529%"><img src="assets/bedroom/trim/curtain-right-closed.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer curtain-layer curtain-left-open" style="--sprite-x:42.96%;--sprite-y:8.3926%;--sprite-w:5.44%;--sprite-h:42.6743%"><img src="assets/bedroom/trim/curtain-left-open.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer curtain-layer curtain-right-open" style="--sprite-x:61.28%;--sprite-y:4.4808%;--sprite-w:8.08%;--sprite-h:47.8663%"><img src="assets/bedroom/trim/curtain-right-open.png" alt="" draggable="false" /></div>
+
+            <div class="room-sprite-layer bright-layer character-layer character-sleeping" style="--sprite-x:23.68%;--sprite-y:46.5861%;--sprite-w:16.92%;--sprite-h:16.7852%"><img src="assets/bedroom/trim/character-sleeping.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer character-layer character-sit-up" style="--sprite-x:44.375%;--sprite-y:38.5185%;--sprite-w:11.3021%;--sprite-h:22.963%"><img src="assets/bedroom/trim/character-sit-up.gif" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer character-layer character-awake" style="--sprite-x:44.375%;--sprite-y:38.5185%;--sprite-w:11.3021%;--sprite-h:22.963%"><img src="assets/bedroom/trim/character-awake.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bedroom-outfit-character" aria-hidden="true"><img src="assets/dressup/trim/character-cuteez.png" alt="Jongho" draggable="false" /></div>
+            <div class="room-sprite-layer light-rays" style="--sprite-x:9.76%;--sprite-y:11.8777%;--sprite-w:56.64%;--sprite-h:75.9602%"><img src="assets/bedroom/trim/morning-light-rays.png" alt="" draggable="false" /></div>
+
+            <div class="interaction-layer" aria-label="Bedroom interactions">
+              <button class="room-hotspot curtain-hotspot curtain-hotspot-left" type="button" data-action="curtain" aria-label="Open the curtains"></button>
+              <button class="room-hotspot curtain-hotspot curtain-hotspot-right" type="button" data-action="curtain" aria-label="Open the curtains"></button>
+              <button class="room-hotspot character-hotspot" type="button" data-action="character" aria-label="Talk to Jongho"></button>
+              <button class="room-hotspot pillow-hotspot" type="button" data-action="dialogue-only" data-copy="pillow" aria-label="Pillow"></button>
+              <button class="room-hotspot poster-hotspot" type="button" data-action="shake" data-layer="poster-layer" aria-label="Poster"></button>
+              <button class="room-hotspot plush-01-hotspot" type="button" data-action="shake" data-layer="plush-01-layer" aria-label="Plush toy"></button>
+              <button class="room-hotspot plush-02-hotspot" type="button" data-action="shake" data-layer="plush-02-layer" aria-label="Plush toy"></button>
+              <button class="room-hotspot soccer-hotspot" type="button" data-action="dialogue" data-layer="soccer-layer" data-copy="soccer" aria-label="Soccer ball"></button>
+              <button class="room-hotspot suitcase-hotspot" type="button" data-action="dialogue" data-layer="suitcase-layer" data-copy="suitcase" aria-label="Suitcase"></button>
+              <button class="room-hotspot humidifier-hotspot" type="button" data-action="dialogue" data-layer="humidifier-layer" data-copy="humidifier" aria-label="Humidifier"></button>
+              <button class="room-hotspot computer-hotspot" type="button" data-action="dialogue" data-layer="computer-layer" data-copy="computer" aria-label="Computer"></button>
+              <button class="room-hotspot phone-hotspot" type="button" data-action="phone" aria-label="Phone"></button>
+              <button class="room-hotspot wardrobe-hotspot" type="button" data-action="wardrobe" aria-label="Open the wardrobe"></button>
+            </div>
+
+            <div class="character-bubble" role="status" aria-live="polite">
+              <p></p>
+            </div>
+
+            <p class="bedroom-time" aria-label="Time">10:12</p>
+            <div class="bedroom-controls">
+              <button
+                class="scene-icon-button bedroom-bgm-toggle"
+                type="button"
+                aria-pressed="true"
+                data-i18n-aria="sceneBgm"
+                aria-label="Toggle BGM"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path class="speaker-body" d="M4 9v6h4l5 4V5L8 9H4Z" />
+                  <path class="speaker-waves" d="M16 8.2c1.1 1 1.6 2.2 1.6 3.8s-.5 2.8-1.6 3.8M18.8 5.7c1.8 1.7 2.7 3.8 2.7 6.3s-.9 4.6-2.7 6.3" />
+                  <path class="speaker-slash" d="M4.5 4.5 19.5 19.5" />
+                </svg>
+              </button>
+              <button
+                class="scene-icon-button bedroom-back-button"
+                type="button"
+                data-i18n-aria="sceneBack"
+                aria-label="Back to previous screen"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 12H6M11 6l-6 6 6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="phone-modal" role="dialog" aria-modal="true" aria-label="Phone messages" aria-hidden="true">
+          <button class="phone-modal-close" type="button" aria-label="Close phone">×</button>
+          <img src="assets/bedroom/phone-chat.png" alt="Birthday messages on the phone" draggable="false" />
+        </div>
+
+        <section class="dressup-scene" aria-hidden="true">
+          <div class="dressup-canvas">
+            <img class="dressup-background" src="assets/dressup/dressup-background.png" alt="" draggable="false" />
+
+            <div class="garment-rail" aria-label="Choose an outfit">
+              <div class="garment-slot slot-cuteez" data-outfit="cuteez">
+                <img class="dressup-layer hanger-layer" src="assets/dressup/trim/hanger-empty.png" alt="" draggable="false" />
+                <img class="dressup-layer garment-layer" src="assets/dressup/trim/hanger-cuteez.png" alt="" draggable="false" />
+                <button class="garment-hit" type="button" aria-label="Try the CUTEEZ outfit"></button>
+              </div>
+              <div class="garment-slot slot-plaid" data-outfit="plaid">
+                <img class="dressup-layer hanger-layer" src="assets/dressup/trim/hanger-empty.png" alt="" draggable="false" />
+                <img class="dressup-layer garment-layer" src="assets/dressup/trim/hanger-striped.png" alt="" draggable="false" />
+                <button class="garment-hit" type="button" aria-label="Try the plaid shirt"></button>
+              </div>
+              <div class="garment-slot slot-henley" data-outfit="henley">
+                <img class="dressup-layer hanger-layer" src="assets/dressup/trim/hanger-empty.png" alt="" draggable="false" />
+                <img class="dressup-layer garment-layer" src="assets/dressup/trim/hanger-plaid.png" alt="" draggable="false" />
+                <button class="garment-hit" type="button" aria-label="Try the henley shirt"></button>
+              </div>
+            </div>
+
+            <button class="dressup-suitcase-hotspot" type="button" aria-label="Suitcase"></button>
+            <div class="bear-costume-wrap">
+              <img class="dressup-layer hidden-bear-costume" src="assets/dressup/trim/hidden-bear-costume.png" alt="" draggable="false" />
+              <button class="bear-costume-hit" type="button" aria-label="Try the hidden bear costume"></button>
+            </div>
+
+            <div class="dressup-character-sway">
+              <div class="dressup-character-pop">
+                <img
+                  class="dressup-character"
+                  src="assets/dressup/trim/character-pajama-still.png"
+                  alt="Jongho"
+                  draggable="false"
+                />
+              </div>
+            </div>
+
+            <div class="dressup-sparkles" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+
+            <div class="dressup-dialogue" role="status" aria-live="polite">
+              <p></p>
+            </div>
+
+            <button class="dressup-confirm-button" type="button" disabled>CONFIRM</button>
+
+            <p class="dressup-time" aria-label="Time">10:12</p>
+            <div class="dressup-controls">
+              <button
+                class="scene-icon-button dressup-bgm-toggle"
+                type="button"
+                aria-pressed="true"
+                data-i18n-aria="sceneBgm"
+                aria-label="Toggle BGM"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path class="speaker-body" d="M4 9v6h4l5 4V5L8 9H4Z" />
+                  <path class="speaker-waves" d="M16 8.2c1.1 1 1.6 2.2 1.6 3.8s-.5 2.8-1.6 3.8M18.8 5.7c1.8 1.7 2.7 3.8 2.7 6.3s-.9 4.6-2.7 6.3" />
+                  <path class="speaker-slash" d="M4.5 4.5 19.5 19.5" />
+                </svg>
+              </button>
+              <button
+                class="scene-icon-button dressup-back-button"
+                type="button"
+                data-i18n-aria="backBedroom"
+                aria-label="Back to bedroom"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 12H6M11 6l-6 6 6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="scene-return-mask" aria-hidden="true"></div>
+      </section>
+
+      <aside class="rotate-notice" aria-label="Rotate device">
+        <span class="rotate-icon" aria-hidden="true">↻</span>
+        <strong data-i18n="rotateTitle">ROTATE YOUR PHONE</strong>
+        <span data-i18n="rotateBody">This experience is designed for landscape view.</span>
+      </aside>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="bedroom.js"></script>
+    <script src="dressup.js"></script>
+  </body>
+</html>
