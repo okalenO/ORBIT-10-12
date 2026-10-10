@@ -141,6 +141,7 @@ applyLanguage("en");
 window.orbitMenu = {
   getLanguage: () => language,
   getBgmEnabled: () => bgmEnabled,
+  setLanguage: applyLanguage,
   toggleBgm,
   resetMenu,
 };

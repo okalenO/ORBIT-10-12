@@ -23,7 +23,7 @@
                   <feDropShadow dx="0" dy="34" stdDeviation="20" flood-color="#16372a" flood-opacity="0.38" />
                 </filter>
               </defs>
-              <g id="roadCopies" filter="url(#paperShadow)"></g>
+              <g id="roadCopies"></g>
             </svg>
             <div id="oceanLayer" class="ocean-layer"></div>
             <div id="propsLayer" class="props-layer"></div>
@@ -61,6 +61,8 @@
             <p id="dialogueText"></p>
           </div>
         </div>
+
+        <img id="flyingBird" class="flying-bird-overlay" src="./assets/street-bird-flying.png" alt="" draggable="false" aria-hidden="true" />
 
         <header class="hud">
           <div class="hud-time">11:00</div>
@@ -105,7 +107,7 @@
 
             <h2 data-copy="午餐时间">午餐时间</h2>
             <p data-copy="先在这里歇一会儿吧~">先在这里歇一会儿吧~</p>
-            <button id="closeRestaurant" class="paper-button" type="button" data-copy="继续散步">继续散步</button>
+            <button id="enterRestaurant" class="paper-button" type="button" data-copy="进入餐厅">进入餐厅</button>
           </section>
         </div>
 

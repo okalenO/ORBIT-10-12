@@ -107,9 +107,13 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .station-bird { position: absolute; left: 50%; bottom: 0; width: 190px; height: 446px; transform: translateX(-50%); filter: drop-shadow(15px 19px 0 rgba(36,32,31,.15)); }
 .station-art { position: absolute; left: 50%; bottom: 0; width: 190px; height: auto; transform: translateX(-50%); }
 .bird-art { position: absolute; z-index: 2; left: 50%; top: -13px; width: 74px; height: auto; transform: translateX(-50%); transition: opacity .12s; }
-.bird-flying { opacity: 0; width: 86px; }
-.prop--bird.is-activated .bird-standing { opacity: 0; }
-.prop--bird.is-activated .bird-flying { opacity: 1; animation: bird-fly 2s cubic-bezier(.18,.7,.22,1) forwards; }
+.prop--bird.bird-departed .bird-standing { opacity: 0; }
+.flying-bird-overlay {
+  position: absolute; z-index: 32; width: 86px; height: auto; opacity: 0; visibility: hidden;
+  pointer-events: none; transform: translate3d(-50%,0,0); transform-origin: 50% 50%;
+  will-change: transform,opacity; backface-visibility: hidden;
+}
+.flying-bird-overlay.is-flying { visibility: visible; animation: bird-overlay-fly 1.8s cubic-bezier(.2,.64,.25,1) forwards; }
 .prop--restaurant { width: 500px; height: 470px; }
 .prop--restaurant .prop-visual { width: 410px; height: 370px; background: #ddbd78; }
 .prop--restaurant .prop-visual::after { content: "RESTAURANT"; position: absolute; inset: 35px 28px auto; padding: 19px 8px; border: 5px solid var(--ink); background: #f5ede0; text-align: center; font-size: 28px; }
@@ -231,7 +235,6 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .prop.is-activated.prop--cat .prop-visual { animation: prop-bounce .58s cubic-bezier(.2,.9,.3,1); }
 .prop.is-activated.prop--tree .prop-visual { animation: tree-shake .76s ease-in-out; }
 .prop.is-activated.prop--billboard .prop-visual { animation: billboard-glow 1.2s ease; }
-.prop.is-activated.prop--bird .prop-visual::after { animation: bird-fly 2s cubic-bezier(.18,.7,.22,1) forwards; }
 .prop--cat .prop-visual { animation: prop-float 3.7s ease-in-out infinite; }
 .prop--gift .prop-visual { animation: none !important; }
 
@@ -245,12 +248,13 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 @keyframes prop-bounce { 0%,100% { transform: translateX(-50%) translateY(0) rotate(0); } 35% { transform: translateX(-50%) translateY(-19px) rotate(-5deg); } 65% { transform: translateX(-50%) translateY(-7px) rotate(4deg); } }
 @keyframes tree-shake { 0%,100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-3deg); } 55% { transform: translateX(-50%) rotate(3deg); } 78% { transform: translateX(-50%) rotate(-1deg); } }
 @keyframes billboard-glow { 0%,100% { filter: brightness(1); } 40% { filter: brightness(1.48) drop-shadow(0 0 30px rgba(255,248,191,.9)); } }
-@keyframes bird-fly {
-  0% { transform: translateX(-50%) translateY(0) rotate(0) scale(.96); opacity: 1; }
-  12% { transform: translateX(-50%) translateY(-14px) rotate(-5deg) scale(1.06,.92); opacity: 1; }
-  34% { transform: translate(95px,-105px) rotate(-9deg) scale(.98,1.03); opacity: 1; }
-  68% { transform: translate(355px,-280px) rotate(-13deg) scale(.87); opacity: .96; }
-  100% { transform: translate(700px,-500px) rotate(-17deg) scale(.68); opacity: 0; }
+@keyframes bird-overlay-fly {
+  0% { transform: translate3d(-50%,0,0) rotate(0) scale(.96); opacity: 1; }
+  8% { transform: translate3d(-35px,-22px,0) rotate(-4deg) scale(1.03,.95); opacity: 1; }
+  24% { transform: translate3d(100px,-112px,0) rotate(-8deg) scale(.99); opacity: 1; }
+  46% { transform: translate3d(295px,-245px,0) rotate(-11deg) scale(.9); opacity: 1; }
+  72% { transform: translate3d(535px,-405px,0) rotate(-14deg) scale(.78); opacity: .96; }
+  100% { transform: translate3d(800px,-585px,0) rotate(-17deg) scale(.64); opacity: 0; }
 }
 @keyframes leaf-fall { 0% { transform: translate(0,0) rotate(0); } 100% { transform: translate(var(--leaf-x),var(--leaf-y)) rotate(var(--leaf-r)); } }
 @keyframes wave-left { from { transform: translateY(9px); } to { transform: translateY(-16px); } }
@@ -341,9 +345,16 @@ button:focus-visible { outline: 3px solid #e9b42f; }
 @keyframes small-art-shake { 0%,100% { rotate: 0deg; } 20% { rotate: -8deg; } 40% { rotate: 7deg; } 60% { rotate: -5deg; } 80% { rotate: 2deg; } }
 .chime-part { transform-origin: 50% 0; }
 .is-aniteez { animation: aniteez-idle 4.5s ease-in-out infinite; }
-.is-aniteez.aniteez-bounce { animation: aniteez-pop 650ms ease-out, aniteez-idle 4.5s 650ms ease-in-out infinite; }
+.is-aniteez.aniteez-bounce { animation: aniteez-pop 480ms cubic-bezier(.2,.9,.25,1), aniteez-idle 4.5s 480ms ease-in-out infinite; }
 @keyframes aniteez-idle { 0%,100% { rotate: -1deg; } 50% { rotate: 1deg; } }
-@keyframes aniteez-pop { 0% { scale: 1.12 .85; } 40% { translate: 0 -24px; scale: .92 1.12; } 70% { scale: 1.05 .95; } 100% { translate: 0 0; scale: 1 1; } }
+@keyframes aniteez-pop {
+  0% { translate: 0 0; scale: 1.04 .94; }
+  6% { translate: 0 2px; scale: 1.12 .84; }
+  24% { translate: 0 -30px; scale: .91 1.13; }
+  58% { translate: 0 -6px; scale: 1.05 .95; }
+  78% { translate: 0 -13px; scale: .98 1.05; }
+  100% { translate: 0 0; scale: 1 1; }
+}
 .has-real-art.prop--billboard.is-activated .billboard-art { animation: ad-glow 2.6s ease-in-out; }
 @keyframes ad-glow { 0%,100% { filter: brightness(1); } 40%,65% { filter: brightness(1.24) drop-shadow(0 0 28px #fff3a0) drop-shadow(0 0 50px rgb(255 213 95 / 80%)); } }
 .restaurant-glow { opacity: 0; transition: opacity 1400ms ease; }
@@ -358,18 +369,23 @@ button:focus-visible { outline: 3px solid #e9b42f; }
 .scene-decor,
 .street-bus {
   contain: layout paint style;
-  content-visibility: auto;
 }
 .prop--bird { contain: layout style; content-visibility: visible; }
+.stage.is-moving .world-cloud,
+.stage.is-moving .scene-decor.is-grass,
+.stage.is-moving .is-aniteez,
+.stage.is-moving .cat-idle,
+.stage.is-moving .cat-sitting { animation-play-state: paused; }
 .real-prop { filter: none; }
 
 .transition-copy {
-  left: 112px;
+  left: auto;
+  right: 44px;
   top: auto;
-  bottom: 82px;
-  width: auto;
+  bottom: 108px;
+  width: max-content;
   transform: none;
-  text-align: left;
+  text-align: center;
 }
 .transition-copy p {
   margin: 0 0 12px;

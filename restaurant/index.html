@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1c1714" />
+    <title>ORBIT 10.12 — 餐厅灰盒 v3</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <section id="stage" class="stage" aria-label="餐厅场景灰盒">
+        <div id="restaurantScene" class="restaurant-scene">
+          <img id="bg1" class="scene-bg is-active" src="./assets/restaurant-bg-01.png" alt="餐厅内景" draggable="false" />
+          <img id="bg2" class="scene-bg" src="./assets/restaurant-bg-02.png" alt="餐厅内景人物反应" draggable="false" />
+          <img id="bg3" class="scene-bg" src="./assets/restaurant-bg-03.png" alt="餐厅内景人物点餐" draggable="false" />
+          <img id="bgBlank" class="scene-bg" src="./assets/restaurant-bg-blank.png" alt="餐厅空景" draggable="false" />
+
+          <div id="ambientLights" class="ambient-lights" aria-hidden="true">
+            <i style="--x:12%;--y:23%;--size:13px;--delay:-1.2s"></i>
+            <i style="--x:29%;--y:51%;--size:8px;--delay:-4.4s"></i>
+            <i style="--x:44%;--y:18%;--size:11px;--delay:-2.8s"></i>
+            <i style="--x:62%;--y:31%;--size:7px;--delay:-5.1s"></i>
+            <i style="--x:76%;--y:17%;--size:12px;--delay:-.6s"></i>
+            <i style="--x:87%;--y:48%;--size:9px;--delay:-3.7s"></i>
+          </div>
+
+          <button id="tableMenu" class="table-menu" type="button" aria-label="打开菜单" disabled>
+            <img src="./assets/restaurant-menu-table.png" alt="菜单" draggable="false" />
+            <span class="menu-hover-mark" aria-hidden="true">✦</span>
+          </button>
+
+          <img id="servedFood" class="served-food" alt="选中的食物" draggable="false" role="button" tabindex="-1" />
+
+          <div id="characterDialogue" class="character-dialogue" role="status"></div>
+          <div id="subtitle" class="subtitle" role="status"></div>
+
+          <div id="waiter" class="waiter" aria-hidden="true">
+            <img class="waiter-art" src="./assets/restaurant-waiter.png" alt="服务员" draggable="false" />
+            <div id="waiterCake" class="waiter-cake" aria-label="装饰好的蛋糕">
+              <img class="waiter-cake-base" src="./assets/restaurant-cake.png" alt="" draggable="false" />
+              <img class="waiter-cake-cream" src="./assets/restaurant-cream-border.png" alt="" draggable="false" />
+              <div id="waiterCakeDecorations" class="waiter-cake-decorations" aria-hidden="true"></div>
+            </div>
+            <div id="waiterDialogue" class="waiter-dialogue"></div>
+          </div>
+
+          <section id="cakeWorkbench" class="cake-workbench" aria-label="蛋糕装饰区域">
+            <div class="cake-note" data-i18n="cakeHint">把喜欢的装饰放到蛋糕上吧</div>
+            <div id="cakeBase" class="cake-base" aria-hidden="true">
+              <img class="cake-art" src="./assets/restaurant-cake.png" alt="" draggable="false" />
+              <img id="creamBorder" class="cream-border" src="./assets/restaurant-cream-border.png" alt="" draggable="false" />
+            </div>
+            <div id="cakeDropzone" class="cake-dropzone" aria-hidden="true"></div>
+            <div id="bearSnapPoint" class="bear-snap-point" aria-hidden="true"></div>
+
+            <button class="cake-piece piece-cherry" data-piece="cherry" data-home-x="335" data-home-y="735" type="button" aria-label="樱桃装饰"><img src="./assets/restaurant-cherry.png" alt="" draggable="false" /></button>
+            <button class="cake-piece piece-strawberry" data-piece="strawberry" data-home-x="500" data-home-y="850" type="button" aria-label="草莓装饰"><img src="./assets/restaurant-strawberry.png" alt="" draggable="false" /></button>
+            <button class="cake-piece piece-star" data-piece="star" data-home-x="665" data-home-y="720" type="button" aria-label="星星装饰"><img src="./assets/restaurant-star.png" alt="" draggable="false" /></button>
+            <button class="cake-piece piece-chocolate" data-piece="chocolate" data-home-x="1435" data-home-y="735" type="button" aria-label="巧克力装饰"><img src="./assets/restaurant-choco.png" alt="" draggable="false" /></button>
+            <button class="cake-piece piece-cookie" data-piece="cookie" data-home-x="1580" data-home-y="855" type="button" aria-label="饼干装饰"><img src="./assets/restaurant-cookie.png" alt="" draggable="false" /></button>
+            <button class="cake-piece piece-candle" data-piece="candle" data-home-x="1310" data-home-y="885" type="button" aria-label="蜡烛装饰"><img src="./assets/restaurant-candle.png" alt="" draggable="false" /></button>
+
+            <button id="pipingBag" class="piping-bag" type="button" aria-label="给蛋糕裱花">
+              <img src="./assets/restaurant-piping-bag.png" alt="裱花袋" draggable="false" />
+            </button>
+
+            <button id="cardTeaser" class="card-teaser" type="button" aria-label="打开贺卡">
+              <img src="./assets/restaurant-card.png" alt="" draggable="false" />
+              <span class="card-teaser-copy" data-i18n="cardOpen">写一张贺卡</span>
+            </button>
+          </section>
+
+          <div class="hud">
+            <span class="hud-time">12:00</span>
+            <button id="soundButton" class="hud-button sound-button" type="button" aria-label="切换背景音乐" aria-pressed="true">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20h9l10-8v24l-10-8H8z"/><path class="sound-wave" d="M33 17c3 4 3 10 0 14M38 12c6 7 6 17 0 24"/></svg>
+            </button>
+            <button id="backButton" class="hud-button back-button" type="button" aria-label="返回上一界面">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 10 8 24l13 14"/><path d="M10 24h19c8 0 11 5 11 12"/></svg>
+            </button>
+          </div>
+          <button id="languageButton" class="language-button" type="button" aria-label="切换语言">中文</button>
+
+          <div class="bottom-action-wrap">
+            <button id="mainAction" class="main-action is-hidden" type="button"></button>
+          </div>
+        </div>
+
+        <div id="menuOverlay" class="menu-overlay" aria-hidden="true">
+          <section class="menu-sheet" aria-label="午餐菜单">
+            <img src="./assets/restaurant-menu-blank.png" alt="" draggable="false" />
+            <p class="menu-instruction" data-i18n="menuHint">选择一道菜，替它画上圈吧</p>
+
+            <button class="dish-choice dish-gukbap" type="button" data-dish="gukbap">
+              <svg class="choice-circle" viewBox="0 0 120 90" aria-hidden="true"><path d="M8 48C10 16 43 3 78 8c31 4 42 20 33 46-9 25-38 32-70 27C14 77 1 66 8 48Z"/><path d="M5 50C8 19 39 1 79 6c34 4 46 22 35 50-11 26-45 31-74 25C12 75-1 65 5 50Z"/></svg>
+            </button>
+            <button class="dish-choice dish-cutlet" type="button" data-dish="cutlet">
+              <svg class="choice-circle" viewBox="0 0 120 90" aria-hidden="true"><path d="M8 48C10 16 43 3 78 8c31 4 42 20 33 46-9 25-38 32-70 27C14 77 1 66 8 48Z"/><path d="M5 50C8 19 39 1 79 6c34 4 46 22 35 50-11 26-45 31-74 25C12 75-1 65 5 50Z"/></svg>
+            </button>
+            <button class="dish-choice dish-jokbal" type="button" data-dish="jokbal">
+              <svg class="choice-circle" viewBox="0 0 120 90" aria-hidden="true"><path d="M8 48C10 16 43 3 78 8c31 4 42 20 33 46-9 25-38 32-70 27C14 77 1 66 8 48Z"/><path d="M5 50C8 19 39 1 79 6c34 4 46 22 35 50-11 26-45 31-74 25C12 75-1 65 5 50Z"/></svg>
+            </button>
+
+            <span class="dish-name name-gukbap" data-i18n="dishGukbap">韩式汤饭</span>
+            <span class="dish-name name-cutlet" data-i18n="dishCutlet">炸猪排套餐</span>
+            <span class="dish-name name-jokbal" data-i18n="dishJokbal">猪蹄</span>
+          </section>
+        </div>
+
+        <div id="cardOverlay" class="card-overlay" aria-hidden="true">
+          <section class="card-sheet" aria-label="生日贺卡">
+            <img class="card-art" src="./assets/restaurant-card.png" alt="" draggable="false" />
+            <div class="card-form">
+              <label for="cardMessage" data-i18n="cardMessageLabel">祝福语</label>
+              <textarea id="cardMessage" data-i18n-placeholder="cardMessagePlaceholder" placeholder="把想说的话写在这里……"></textarea>
+              <p class="card-local-note" data-i18n="cardLocalOnly">内容仅保存在你的设备中，请放心写下想说的话。</p>
+              <label for="cardSignature" data-i18n="cardSignatureLabel">署名</label>
+              <input id="cardSignature" type="text" data-i18n-placeholder="cardSignaturePlaceholder" placeholder="你的名字" />
+              <button id="saveCardButton" class="save-card-button" type="button" data-i18n="saveCard">写好了</button>
+            </div>
+          </section>
+        </div>
+
+        <section id="transition" class="transition is-active" aria-label="场景转场">
+          <div class="transition-paper" aria-hidden="true"></div>
+          <p class="transition-time">12:00</p>
+          <p class="transition-place" data-i18n="transitionPlace">餐厅</p>
+        </section>
+
+        <section id="nextScene" class="next-scene" aria-hidden="true">
+          <p data-i18n="nextPlaceholder">下一幕待接入</p>
+        </section>
+
+        <div class="rotate-note">横屏观看效果更完整<br /><small>请旋转手机</small></div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

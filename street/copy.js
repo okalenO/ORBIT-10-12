@@ -25,6 +25,7 @@ window.orbitStreetCopy = {
   'ON THE STREET': ['Let’s take our time~','천천히 걷자~','慢慢走吧~'],
   'SKIP': ['SKIP','건너뛰기','跳过'],
   '继续散步': ['KEEP WALKING','계속 산책하기'],
+  '进入餐厅': ['ENTER','들어가기'],
   '午餐时间': ['LUNCH TIME','점심시간'],
   '先在这里歇一会儿吧~': ['Let’s take a little break here~','여기서 잠깐 쉬어 가자~'],
   '切换声音': ['Toggle sound','소리 켜기/끄기'],

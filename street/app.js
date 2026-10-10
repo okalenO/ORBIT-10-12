@@ -36,6 +36,7 @@
   const pirateShipRig = $("#pirateShipRig");
   const dialogueSign = $("#dialogueSign");
   const dialogueText = $("#dialogueText");
+  const flyingBird = $("#flyingBird");
   const coffeeOverlay = $("#coffeeOverlay");
   const restaurantOverlay = $("#restaurantOverlay");
   const confirmDrink = $("#confirmDrink");
@@ -132,6 +133,7 @@
     pointerDragged: false,
     lastPointerX: 0,
     dialogueTimer: null,
+    birdFlightTimer: null,
     magazineDialogueShown: false,
     lastInteractionX: NaN,
     lastInteractionTime: 0,
@@ -142,6 +144,7 @@
   const propCache = new Map();
   const itemHalfWidths = new Map();
   let aniteezElements = [];
+  let worldVisuals = [];
 
   function propsFor(id) {
     if (!propCache.has(id)) propCache.set(id, Array.from($$(`.prop[data-id="${id}"]`)));
@@ -154,6 +157,20 @@
       itemHalfWidths.set(item.id, Math.max(...props.map(prop => prop.offsetWidth / 2)));
     });
     aniteezElements = Array.from($$(".is-aniteez"));
+    worldVisuals = Array.from($$(".prop,.scene-decor,.world-cloud,.world-balloon")).map(element => ({
+      element,
+      x: Number.parseFloat(element.style.left) || 0,
+    }));
+    updateVisibleWorld(mod(state.position, TRACK_W));
+  }
+
+  function updateVisibleWorld(localX) {
+    const worldCenter = localX + TRACK_W;
+    const minX = worldCenter - PLAYER_X - 900;
+    const maxX = worldCenter + (STAGE_W - PLAYER_X) + 900;
+    worldVisuals.forEach(entry => {
+      entry.element.style.visibility = entry.x >= minX && entry.x <= maxX ? "visible" : "hidden";
+    });
   }
 
   function tr(text) {
@@ -270,7 +287,6 @@
           prop.innerHTML = `<div class="station-bird">
             <img class="station-art" src="./assets/street-station-display.png" alt="站牌" draggable="false">
             <img class="bird-art bird-standing" src="./assets/street-bird-standing.png" alt="小鸟" draggable="false">
-            <img class="bird-art bird-flying" src="./assets/street-bird-flying.png" alt="飞翔的小鸟" draggable="false">
           </div>`;
         } else {
           prop.innerHTML = item.asset
@@ -440,7 +456,8 @@
     tentacleRig.classList.remove("is-popping");
     drinkCup.removeAttribute("data-drink");
     state.activation.forEach((entry) => { entry.armed = true; entry.nearAnnounced = false; entry.doorArmed = true; });
-    $$(".prop").forEach((prop) => prop.classList.remove("is-activated", "is-flipped", "is-near", "cat-switched", "clerk-visible", "sign-lit", "doors-open"));
+    $$(".prop").forEach((prop) => prop.classList.remove("is-activated", "is-flipped", "is-near", "cat-switched", "clerk-visible", "sign-lit", "doors-open", "bird-departed"));
+    flyingBird.classList.remove("is-flying");
     $$(".octopus").forEach((octopus) => octopus.classList.remove("is-defeated"));
     $$(".strike-rig").forEach((rig) => rig.classList.remove("is-swinging"));
   }
@@ -461,8 +478,31 @@
     if (active) window.setTimeout(() => propsFor(id).forEach((prop) => { if (id !== "bird") prop.classList.remove("is-activated"); }), id === "billboard" ? 2800 : 1500);
   }
 
+  function launchBird() {
+    const source = propsFor("bird").find((prop) => {
+      if (prop.style.visibility === "hidden") return false;
+      const rect = prop.querySelector(".bird-standing")?.getBoundingClientRect();
+      return rect && rect.right > 0 && rect.left < window.innerWidth;
+    });
+    const bird = source?.querySelector(".bird-standing");
+    if (!bird) return;
+
+    const stageRect = stage.getBoundingClientRect();
+    const birdRect = bird.getBoundingClientRect();
+    const scale = stageRect.width / STAGE_W || 1;
+    flyingBird.style.left = `${(birdRect.left + birdRect.width / 2 - stageRect.left) / scale}px`;
+    flyingBird.style.top = `${(birdRect.top - stageRect.top) / scale}px`;
+    propsFor("bird").forEach((prop) => prop.classList.add("bird-departed"));
+    flyingBird.classList.remove("is-flying");
+    void flyingBird.offsetWidth;
+    flyingBird.classList.add("is-flying");
+    window.clearTimeout(state.birdFlightTimer);
+    state.birdFlightTimer = window.setTimeout(() => flyingBird.classList.remove("is-flying"), 1850);
+  }
+
   function activateNearItem(item) {
-    markActivated(item.id, true);
+    if (item.id === "bird") launchBird();
+    else markActivated(item.id, true);
     if (item.dialogue) showDialogue(item.dialogue, item.id === "billboard" ? 3500 : 2800);
     if (item.id === "tree") createLeaves(item.x);
     playPaperSound(item.id === "restaurant" ? 620 : 350);
@@ -569,6 +609,14 @@
     window.setTimeout(() => { state.overlayOpen = false; }, 380);
   }
 
+  function enterRestaurant() {
+    restaurantOverlay.classList.remove("is-open");
+    restaurantOverlay.setAttribute("aria-hidden", "true");
+    state.overlayOpen = false;
+    if (bridge?.enterRestaurant) bridge.enterRestaurant();
+    else closeRestaurant();
+  }
+
   function defeatOctopus() {
     const localX = mod(state.position, TRACK_W);
     if (state.octopusDefeated || state.octopusAttackPlaying || Math.abs(circularDelta(OCTOPUS_X, localX)) > 650) return;
@@ -649,7 +697,7 @@
       if (!visible) {
         entry.armed = true; entry.nearAnnounced = false;
         props.forEach(prop => prop.classList.remove("cat-switched", "clerk-visible", "sign-lit"));
-        if (item.id === "bird") props.forEach(prop => prop.classList.remove("is-activated"));
+        if (item.id === "bird") props.forEach(prop => prop.classList.remove("bird-departed"));
       }
       if (item.trigger === "near" && distance < 150 && entry.armed) {
         entry.armed = false; activateNearItem(item);
@@ -727,6 +775,7 @@
       state.position += (state.targetPosition - state.position) * easing;
       state.velocity += ((state.position - previous) - state.velocity) * .18;
     }
+    stage.classList.toggle("is-moving", Math.abs(state.targetPosition - state.position) > 0.35);
     const nextLap = Math.floor(state.position / TRACK_W);
     if (nextLap !== state.lap) resetLap(nextLap);
     const localX = mod(state.position, TRACK_W);
@@ -749,14 +798,19 @@
     updatePirateScene(localX, y, now);
     updateBus(now);
 
-    state.look.x += (state.look.targetX - state.look.x) * .065;
-    state.look.y += (state.look.targetY - state.look.y) * .065;
-    sceneCamera.style.setProperty("--look-x", `${state.look.x.toFixed(2)}px`);
-    sceneCamera.style.setProperty("--look-y", `${state.look.y.toFixed(2)}px`);
+    const lookDeltaX = state.look.targetX - state.look.x;
+    const lookDeltaY = state.look.targetY - state.look.y;
+    if (Math.abs(lookDeltaX) > .01 || Math.abs(lookDeltaY) > .01) {
+      state.look.x += lookDeltaX * .065;
+      state.look.y += lookDeltaY * .065;
+      sceneCamera.style.setProperty("--look-x", `${state.look.x.toFixed(2)}px`);
+      sceneCamera.style.setProperty("--look-y", `${state.look.y.toFixed(2)}px`);
+    }
     if (!state.overlayOpen && !state.transitionActive &&
         (Math.abs(localX - state.lastInteractionX) > 2 || now - state.lastInteractionTime > 90)) {
       state.lastInteractionX = localX;
       state.lastInteractionTime = now;
+      updateVisibleWorld(localX);
       updateNearInteractions(localX);
     }
     requestAnimationFrame(render);
@@ -844,7 +898,7 @@
     $$(".drink-hotspot").forEach((button) => button.addEventListener("click", (event) => { event.stopPropagation(); selectDrink(button.dataset.drink); }));
     confirmDrink.addEventListener("click", (event) => { event.stopPropagation(); closeCoffee(true); });
     coffeeOverlay.addEventListener("click", (event) => { if (event.target === coffeeOverlay) closeCoffee(false); });
-    $("#closeRestaurant").addEventListener("click", closeRestaurant);
+    $("#enterRestaurant").addEventListener("click", enterRestaurant);
     $("#backButton").addEventListener("click", () => bridge?.returnToBedroom());
     $("#soundButton").addEventListener("click", (event) => {
       if (bridge) window.parent.orbitMenu.toggleBgm();
