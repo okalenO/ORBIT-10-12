@@ -81,9 +81,9 @@
         <div id="coffeeOverlay" class="scene-overlay coffee-overlay" aria-hidden="true">
           <section id="coffeeMenu" class="coffee-menu" aria-label="选择饮品">
             <img class="menu-layer menu-background" src="./assets/menu-background.png" alt="今日饮品菜单" draggable="false" />
-            <img class="menu-layer menu-drink menu-drink--americano" src="./assets/menu-americano.png" alt="" draggable="false" />
-            <img class="menu-layer menu-drink menu-drink--tea" src="./assets/menu-tea.png" alt="" draggable="false" />
-            <img class="menu-layer menu-drink menu-drink--strawberry" src="./assets/menu-strawberry.png" alt="" draggable="false" />
+            <span class="menu-drink menu-drink--americano" aria-hidden="true"><img src="./assets/supplement/americano.png" alt="" draggable="false" /></span>
+            <span class="menu-drink menu-drink--tea" aria-hidden="true"><img src="./assets/supplement/洋甘菊茶.png" alt="" draggable="false" /></span>
+            <span class="menu-drink menu-drink--strawberry" aria-hidden="true"><img src="./assets/supplement/草莓奶昔.png" alt="" draggable="false" /></span>
             <img id="menuWalker" class="menu-walker" alt="当前服装人物" draggable="false" />
             <img id="menuBear" class="menu-layer menu-bear" alt="饮品反应" draggable="false" />
             <p id="menuBearText" class="menu-bear-text"></p>
@@ -116,7 +116,6 @@
           <div class="transition-copy">
             <p>11:00</p>
             <h1 data-copy="街上">街上</h1>
-            <span data-copy="ON THE STREET">ON THE STREET</span>
           </div>
           <button id="skipTransition" type="button" data-copy="SKIP">SKIP</button>
         </section>

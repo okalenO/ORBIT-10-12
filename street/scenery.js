@@ -18,7 +18,7 @@ window.orbitStreetArt = (() => {
     }
     if (id === 'kq') {
       const base=[217,360,1419,1264];
-      return rig(base,480,crop('KQ',base)+part('左门1',[684,1413,154,163],base,'door-left door-closed')+part('左门2',[682,1409,31,167],base,'door-left door-open')+part('右门1',[822,1419,178,162],base,'door-right door-closed')+part('右门2',[969,1411,31,175],base,'door-right door-open'));
+      return rig(base,691.2,crop('KQ',base)+part('左门1',[684,1413,154,163],base,'door-left door-closed')+part('左门2',[682,1409,31,167],base,'door-left door-open')+part('右门1',[822,1419,178,162],base,'door-right door-closed')+part('右门2',[969,1411,31,175],base,'door-right door-open'));
     }
     if (id === 'coffee') {
       const base=[324,494,1370,1047];
@@ -30,34 +30,17 @@ window.orbitStreetArt = (() => {
     }
     if (id === 'magazine') {
       const base=[456,248,1044,1106];
-      return rig(base,350,crop('杂志架',base)+`<button class="magazine-button" type="button" aria-label="翻阅杂志" style="left:445px;top:624px;width:291px;height:249px">${part('杂志1',[926,872,201,249],[901,872],'magazine-front')}${part('杂志2',[0,0,330,282],[0,0],'magazine-back',[330,282])}</button>`);
+      return rig(base,224,crop('杂志架',base)+`<button class="magazine-button" type="button" aria-label="翻阅杂志" style="left:445px;top:624px;width:291px;height:249px">${part('杂志1',[926,872,201,249],[901,872],'magazine-front')}${part('杂志2',[0,0,330,282],[0,0],'magazine-back',[330,282])}</button>`);
     }
     if (id === 'billboard') return rig([0,0,1502,1048],490,crop('广告牌',[0,0,1502,1048],'billboard-art',[1502,1048]));
     if (id === 'restaurant') {
       const base=[432,240,1174,1245];
-      return rig(base,490,crop('餐厅',base)+part('风铃',[629,838,154,334],base,'chime-part')+part('餐厅招牌发光',[0,0,561,123],[-320,-48],'restaurant-glow',[561,123]));
+      return rig(base,490,crop('餐厅',base)+part('风铃',[629,838,154,334],base,'chime-part')+part('餐厅招牌发光',[0,0,561,123],[-320,-20],'restaurant-glow',[561,123]));
     }
     return '';
   }
-  const alpha = new Map();
   function magazineHit(event) {
-    const button=event.target.closest('.magazine-button');
-    if (!button) return false;
-    if (event.detail === 0) return true; // keyboard activation
-    const flipped=button.closest('.prop').classList.contains('is-flipped');
-    const image=button.querySelector(flipped ? '.magazine-back img' : '.magazine-front img');
-    if (!image.complete || !image.naturalWidth) return false;
-    const bounds=image.getBoundingClientRect();
-    const x=Math.floor((event.clientX-bounds.left)/bounds.width*image.naturalWidth);
-    const y=Math.floor((event.clientY-bounds.top)/bounds.height*image.naturalHeight);
-    if(x<0||y<0||x>=image.naturalWidth||y>=image.naturalHeight)return false;
-    let pixels=alpha.get(image.src);
-    if (!pixels) {
-      const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-      const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0);
-      pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;alpha.set(image.src,pixels);
-    }
-    return pixels[(y*image.naturalWidth+x)*4+3]>32;
+    return Boolean(event.target.closest('.magazine-button'));
   }
   function drinkMarkup(id) {
     const specs={americano:['americano',[335,284,416,645],[2048,2048]],chamomile:['洋甘菊茶',[372,250,534,795],[2048,2048]],strawberry:['草莓奶昔',[0,0,561,952],[561,952]]};

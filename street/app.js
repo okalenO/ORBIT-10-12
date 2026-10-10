@@ -44,6 +44,10 @@
   const menuBearText = $("#menuBearText");
   const transition = $("#transition");
   const transitionVideo = $("#transitionVideo");
+  const pageTurnAudio = new Audio("./assets/audio/page-turn.mp3");
+  const chimeAudio = new Audio("./assets/audio/wind-chime.mp3");
+  pageTurnAudio.preload = "auto";
+  chimeAudio.preload = "auto";
 
   roadSvg.setAttribute("viewBox", `0 0 ${TRACK_W * 3} 1350`);
   roadSvg.style.width = `${TRACK_W * 3}px`;
@@ -67,7 +71,7 @@
     { id: "tree", x: 2050, type: "tree", asset: "./assets/street-tree-v4-01.png", trigger: "near", dialogue: "已经是秋天了", resetDistance: 470 },
     { id: "coffee", x: 3450, type: "coffee", trigger: "click", nearDialogue: "要不要进去买一杯咖啡呢？" },
     { id: "kq", x: 4650, type: "building", trigger: "click", dialogue: "今天就先不去公司了吧  ^^" },
-    { id: "gift", x: 5850, type: "gift", trigger: "near", dialogue: "这个有点像我诶", resetDistance: 450 },
+    { id: "gift", x: 5850, type: "gift", trigger: "hover", dialogue: "这个有点像我诶", resetDistance: 450 },
     { id: "magazine", x: 7100, type: "magazine", trigger: "click", dialogue: "很新奇的造型吧~？我也有些不习惯呢，以后会展示更多不同的面貌的！" },
     { id: "billboard", x: 8250, type: "billboard", trigger: "near", dialogue: "是我们的广告牌，8m1t！", resetDistance: 500 },
     { id: "bird", x: 12050, type: "bird", trigger: "near", resetDistance: 1000 },
@@ -128,10 +132,29 @@
     pointerDragged: false,
     lastPointerX: 0,
     dialogueTimer: null,
+    magazineDialogueShown: false,
+    lastInteractionX: NaN,
+    lastInteractionTime: 0,
     lastTime: performance.now(),
     look: { x: 0, y: 0, targetX: 0, targetY: 0 },
     activation: new Map(sceneItems.map((item) => [item.id, { armed: true, nearAnnounced: false }])),
   };
+  const propCache = new Map();
+  const itemHalfWidths = new Map();
+  let aniteezElements = [];
+
+  function propsFor(id) {
+    if (!propCache.has(id)) propCache.set(id, Array.from($$(`.prop[data-id="${id}"]`)));
+    return propCache.get(id);
+  }
+
+  function cacheSceneElements() {
+    sceneItems.forEach(item => {
+      const props = propsFor(item.id);
+      itemHalfWidths.set(item.id, Math.max(...props.map(prop => prop.offsetWidth / 2)));
+    });
+    aniteezElements = Array.from($$(".is-aniteez"));
+  }
 
   function tr(text) {
     const row = window.orbitStreetCopy[text];
@@ -336,6 +359,20 @@
       handleItemClick(item);
     });
 
+    propsLayer.addEventListener("pointerover", (event) => {
+      const prop = event.target.closest('.prop[data-id="gift"],.prop[data-id="restaurant"]');
+      if (!prop || prop.contains(event.relatedTarget) || state.overlayOpen || state.transitionActive) return;
+      const item = sceneItems.find(candidate => candidate.id === prop.dataset.id);
+      if (!item) return;
+      if (item.id === "gift") {
+        bouncePart(propsFor("gift"), ".teddy-part");
+        showDialogue(item.dialogue, 2800);
+      } else {
+        bouncePart(propsFor("restaurant"), ".chime-part");
+        playChime();
+      }
+    });
+
     propsLayer.addEventListener("keydown", (event) => {
       if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-octopus]")) defeatOctopus();
     });
@@ -420,8 +457,8 @@
   }
 
   function markActivated(id, active = true) {
-    $$(`.prop[data-id="${id}"]`).forEach((prop) => prop.classList.toggle("is-activated", active));
-    if (active) window.setTimeout(() => $$(`.prop[data-id="${id}"]`).forEach((prop) => { if (id !== "bird") prop.classList.remove("is-activated"); }), id === "billboard" ? 2800 : 1500);
+    propsFor(id).forEach((prop) => prop.classList.toggle("is-activated", active));
+    if (active) window.setTimeout(() => propsFor(id).forEach((prop) => { if (id !== "bird") prop.classList.remove("is-activated"); }), id === "billboard" ? 2800 : 1500);
   }
 
   function activateNearItem(item) {
@@ -457,7 +494,11 @@
     if (item.id === "magazine") {
       $$(".prop--magazine").forEach((prop) => prop.classList.toggle("is-flipped"));
       playPageTurn();
-      showDialogue(item.dialogue, 5200); return;
+      if (!state.magazineDialogueShown) {
+        state.magazineDialogueShown = true;
+        showDialogue(item.dialogue, 5200);
+      }
+      return;
     }
     if (item.id === "restaurant") { openRestaurant(); return; }
     showDialogue(item.dialogue, 3200);
@@ -598,12 +639,12 @@
     sceneItems.forEach(item => {
       const delta = circularDelta(item.x, localX), distance = Math.abs(delta);
       const entry = state.activation.get(item.id);
-      const props = $$(`.prop[data-id="${item.id}"]`);
-      const half = Math.max(...Array.from(props, prop => prop.offsetWidth / 2));
+      const props = propsFor(item.id);
+      const half = itemHalfWidths.get(item.id) || 250;
       const visible = PLAYER_X + delta + half > 0 && PLAYER_X + delta - half < STAGE_W;
       props.forEach(prop => {
         prop.classList.toggle("is-near", distance < 500);
-        prop.style.pointerEvents = item.trigger === "click" && distance < 570 ? "auto" : "none";
+        prop.style.pointerEvents = ((item.trigger === "click" && distance < 570) || item.trigger === "hover" || item.id === "restaurant") ? "auto" : "none";
       });
       if (!visible) {
         entry.armed = true; entry.nearAnnounced = false;
@@ -613,7 +654,6 @@
       if (item.trigger === "near" && distance < 150 && entry.armed) {
         entry.armed = false; activateNearItem(item);
         if (item.id === "cat") props.forEach(prop => prop.classList.add("cat-switched"));
-        if (item.id === "gift") bouncePart(props, ".teddy-part");
       }
       if (["coffee", "magazine", "restaurant"].includes(item.id) && distance < 225 && !entry.nearAnnounced) {
         entry.nearAnnounced = true;
@@ -622,7 +662,6 @@
         if (item.id === "magazine") bouncePart(props, ".magazine-button");
         if (item.id === "restaurant") {
           props.forEach(prop => prop.classList.add("sign-lit"));
-          bouncePart(props, ".chime-part"); playChime();
         }
       }
       if (item.id === "kq") {
@@ -633,11 +672,11 @@
           window.setTimeout(() => {
             props.forEach(prop => prop.classList.remove("doors-open"));
             window.setTimeout(() => { entry.doorBusy = false; }, 650);
-          }, 2650);
+          }, 1650);
         }
       }
     });
-    $$(".is-aniteez").forEach(decor => {
+    aniteezElements.forEach(decor => {
       const delta = circularDelta(Number(decor.dataset.worldX), localX);
       const visible = PLAYER_X + delta + 90 > 0 && PLAYER_X + delta - 90 < STAGE_W;
       if (!visible) decor.dataset.armed = "true";
@@ -703,7 +742,7 @@
     foregroundLayer.style.transform = world.style.transform;
     characterRig.style.top = `${y.toFixed(2)}px`;
     characterRig.style.transform = `rotate(${(slopeAngle + motionLean).toFixed(2)}deg)`;
-    drinkRig.style.top = `${(y - 72).toFixed(2)}px`;
+    drinkRig.style.top = `${(y - 82).toFixed(2)}px`;
     if (!drinkRig.classList.contains("is-hidden")) drinkRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 430) * 1.2).toFixed(2)}deg)`;
     tentacleRig.style.top = `${(y - 72).toFixed(2)}px`;
     if (!tentacleRig.classList.contains("is-hidden")) tentacleRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 460) * 1.05).toFixed(2)}deg)`;
@@ -714,7 +753,12 @@
     state.look.y += (state.look.targetY - state.look.y) * .065;
     sceneCamera.style.setProperty("--look-x", `${state.look.x.toFixed(2)}px`);
     sceneCamera.style.setProperty("--look-y", `${state.look.y.toFixed(2)}px`);
-    if (!state.overlayOpen && !state.transitionActive) updateNearInteractions(localX);
+    if (!state.overlayOpen && !state.transitionActive &&
+        (Math.abs(localX - state.lastInteractionX) > 2 || now - state.lastInteractionTime > 90)) {
+      state.lastInteractionX = localX;
+      state.lastInteractionTime = now;
+      updateNearInteractions(localX);
+    }
     requestAnimationFrame(render);
   }
 
@@ -768,29 +812,13 @@
 
   function playPageTurn() {
     if (!state.soundOn) return;
-    try {
-      audioContext ||= new AudioContext(); audioContext.resume();
-      const length = Math.floor(audioContext.sampleRate * .32);
-      const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < length; i++) data[i] = (Math.random()*2-1) * Math.sin(Math.PI*i/length);
-      const source = audioContext.createBufferSource(), filter = audioContext.createBiquadFilter(), gain = audioContext.createGain();
-      source.buffer = buffer; filter.type = "bandpass"; filter.frequency.value = 1700; filter.Q.value = .7;
-      gain.gain.value = .1; source.connect(filter).connect(gain).connect(audioContext.destination); source.start();
-    } catch (_) {}
+    pageTurnAudio.currentTime = 0;
+    pageTurnAudio.play().catch(() => {});
   }
   function playChime() {
     if (!state.soundOn) return;
-    try {
-      audioContext ||= new AudioContext(); audioContext.resume();
-      [1046.5,1568,2093].forEach((frequency,i) => {
-        const osc = audioContext.createOscillator(), gain = audioContext.createGain();
-        const at = audioContext.currentTime + i*.11; osc.frequency.value = frequency;
-        gain.gain.setValueAtTime(.0001,at); gain.gain.linearRampToValueAtTime(.025,at+.012);
-        gain.gain.exponentialRampToValueAtTime(.0001,at+1.6);
-        osc.connect(gain).connect(audioContext.destination); osc.start(at); osc.stop(at+1.7);
-      });
-    } catch (_) {}
+    chimeAudio.currentTime = 0;
+    chimeAudio.play().catch(() => {});
   }
   function endTransition() {
     if (!state.transitionActive || transition.classList.contains("is-leaving")) return;
@@ -800,7 +828,6 @@
       transition.classList.remove("is-active", "is-leaving");
       transition.setAttribute("aria-hidden", "true");
       transitionVideo.pause();
-      showDialogue("慢慢走吧~", 2300);
     }, 1160);
   }
 
@@ -838,6 +865,7 @@
   };
   buildRoad();
   buildProps();
+  cacheSceneElements();
   setOutfit(state.outfit);
   updateScale();
   bindEvents();

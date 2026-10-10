@@ -103,13 +103,13 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .prop--billboard { width: 430px; height: 360px; }
 .prop--billboard .prop-visual { width: 380px; height: 220px; bottom: 82px; background: #5365b8; }
 .prop--billboard .prop-visual::after { content: "8M1T"; position: absolute; inset: 28px; display: grid; place-items: center; border: 5px solid #f5efdf; color: #f5efdf; font-size: 56px; }
-.prop--bird { width: 250px; height: 470px; }
+.prop--bird { width: 250px; height: 470px; overflow: visible; }
 .station-bird { position: absolute; left: 50%; bottom: 0; width: 190px; height: 446px; transform: translateX(-50%); filter: drop-shadow(15px 19px 0 rgba(36,32,31,.15)); }
 .station-art { position: absolute; left: 50%; bottom: 0; width: 190px; height: auto; transform: translateX(-50%); }
 .bird-art { position: absolute; z-index: 2; left: 50%; top: -13px; width: 74px; height: auto; transform: translateX(-50%); transition: opacity .12s; }
 .bird-flying { opacity: 0; width: 86px; }
 .prop--bird.is-activated .bird-standing { opacity: 0; }
-.prop--bird.is-activated .bird-flying { opacity: 1; animation: bird-fly 1.2s cubic-bezier(.2,.65,.25,1) forwards; }
+.prop--bird.is-activated .bird-flying { opacity: 1; animation: bird-fly 2s cubic-bezier(.18,.7,.22,1) forwards; }
 .prop--restaurant { width: 500px; height: 470px; }
 .prop--restaurant .prop-visual { width: 410px; height: 370px; background: #ddbd78; }
 .prop--restaurant .prop-visual::after { content: "RESTAURANT"; position: absolute; inset: 35px 28px auto; padding: 19px 8px; border: 5px solid var(--ink); background: #f5ede0; text-align: center; font-size: 28px; }
@@ -137,13 +137,13 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .leaf { position: absolute; z-index: 14; width: 18px; height: 29px; border: 3px solid var(--ink); border-radius: 80% 15% 70% 30%; background: #d9853a; pointer-events: none; animation: leaf-fall 2.8s cubic-bezier(.25,.1,.8,1) forwards; }
 
 .character-rig { position: absolute; left: 656px; top: 790px; z-index: 8; width: 1px; height: 1px; transform-origin: 0 0; pointer-events: none; will-change: transform,top; }
-.character-stick { position: absolute; z-index: -2; left: -4px; top: -13px; width: 8px; height: 455px; border-radius: 4px; background: var(--brown); transform-origin: top center; }
+.character-stick { position: absolute; z-index: -2; left: -4px; top: -13px; width: 8px; height: 620px; border-radius: 4px; background: var(--brown); transform-origin: top center; }
 .character-bob { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform-origin: 0 0; animation: character-idle 2.7s ease-in-out infinite; will-change: transform; }
 #characterImage { position: absolute; z-index: 2; max-width: none; width: 844.8px; height: 475.2px; pointer-events: none; -webkit-user-drag: none; filter: drop-shadow(18px 22px 0 rgba(36,32,31,.25)) drop-shadow(2px 5px 7px rgba(36,32,31,.18)); }
 
 .drink-rig { position: absolute; z-index: 9; left: 748px; top: 650px; width: 1px; height: 1px; transition: opacity .28s, transform .5s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
 .drink-rig.is-hidden { opacity: 0; transform: translateY(120px) scale(.7); }
-.drink-stick { position: absolute; z-index: -2; left: -4px; top: 20px; width: 7px; height: 455px; border-radius: 4px; background: var(--brown); transition: transform .28s ease-in, opacity .18s ease; transform-origin: top center; }
+.drink-stick { position: absolute; z-index: -2; left: -4px; top: 20px; width: 7px; height: 620px; border-radius: 4px; background: var(--brown); transition: transform .28s ease-in, opacity .18s ease; transform-origin: top center; }
 .drink-cup { position: absolute; z-index: 3; left: -23px; top: -34px; width: 46px; height: 58px; display: grid; place-items: center; border: 3px solid var(--ink); border-radius: 4px 4px 15px 15px; background: #a47d5d; transform: rotate(-7deg); box-shadow: 8px 10px 0 rgba(36,32,31,.2), 2px 3px 5px rgba(36,32,31,.16); }
 .drink-cup span { font-size: 7px; font-weight: 1000; writing-mode: vertical-rl; }
 .drink-cup[data-drink="chamomile"] { background: #bcdb76; }
@@ -231,7 +231,7 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .prop.is-activated.prop--cat .prop-visual { animation: prop-bounce .58s cubic-bezier(.2,.9,.3,1); }
 .prop.is-activated.prop--tree .prop-visual { animation: tree-shake .76s ease-in-out; }
 .prop.is-activated.prop--billboard .prop-visual { animation: billboard-glow 1.2s ease; }
-.prop.is-activated.prop--bird .prop-visual::after { animation: bird-fly 1.2s cubic-bezier(.2,.65,.25,1) forwards; }
+.prop.is-activated.prop--bird .prop-visual::after { animation: bird-fly 2s cubic-bezier(.18,.7,.22,1) forwards; }
 .prop--cat .prop-visual { animation: prop-float 3.7s ease-in-out infinite; }
 .prop--gift .prop-visual { animation: none !important; }
 
@@ -245,7 +245,13 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 @keyframes prop-bounce { 0%,100% { transform: translateX(-50%) translateY(0) rotate(0); } 35% { transform: translateX(-50%) translateY(-19px) rotate(-5deg); } 65% { transform: translateX(-50%) translateY(-7px) rotate(4deg); } }
 @keyframes tree-shake { 0%,100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-3deg); } 55% { transform: translateX(-50%) rotate(3deg); } 78% { transform: translateX(-50%) rotate(-1deg); } }
 @keyframes billboard-glow { 0%,100% { filter: brightness(1); } 40% { filter: brightness(1.48) drop-shadow(0 0 30px rgba(255,248,191,.9)); } }
-@keyframes bird-fly { to { transform: translate(360px,-290px) rotate(-16deg); opacity: 0; } }
+@keyframes bird-fly {
+  0% { transform: translateX(-50%) translateY(0) rotate(0) scale(.96); opacity: 1; }
+  12% { transform: translateX(-50%) translateY(-14px) rotate(-5deg) scale(1.06,.92); opacity: 1; }
+  34% { transform: translate(95px,-105px) rotate(-9deg) scale(.98,1.03); opacity: 1; }
+  68% { transform: translate(355px,-280px) rotate(-13deg) scale(.87); opacity: .96; }
+  100% { transform: translate(700px,-500px) rotate(-17deg) scale(.68); opacity: 0; }
+}
 @keyframes leaf-fall { 0% { transform: translate(0,0) rotate(0); } 100% { transform: translate(var(--leaf-x),var(--leaf-y)) rotate(var(--leaf-r)); } }
 @keyframes wave-left { from { transform: translateY(9px); } to { transform: translateY(-16px); } }
 @keyframes wave-right { from { transform: translateY(-16px); } to { transform: translateY(9px); } }
@@ -302,10 +308,10 @@ button:focus-visible { outline: 3px solid #e9b42f; }
 .art-crop img { position: absolute; max-width: none; pointer-events: none; }
 .art-part { position: absolute; transform-origin: 50% 100%; }
 .has-real-art.prop--cat { width: 200px; height: 115px; }
-.has-real-art.prop--building { width: 480px; height: 430px; }
+.has-real-art.prop--building { width: 691.2px; height: 619.2px; }
 .has-real-art.prop--coffee { width: 500px; height: 382px; }
 .has-real-art.prop--gift { width: 480px; height: 324px; }
-.has-real-art.prop--magazine { width: 350px; height: 371px; cursor: default; }
+.has-real-art.prop--magazine { width: 224px; height: 238px; cursor: default; }
 .has-real-art.prop--billboard { width: 490px; height: 342px; }
 .has-real-art.prop--restaurant { width: 490px; height: 520px; }
 .cat-idle, .cat-sitting { transform-origin: 50% 100%; animation: cat-idle 4.4s ease-in-out infinite; }
@@ -326,7 +332,7 @@ button:focus-visible { outline: 3px solid #e9b42f; }
 .clerk-part { transform: translateY(270px) scale(1.2,.7); transform-origin: 50% 100%; }
 .clerk-visible .clerk-part { animation: clerk-pop 850ms cubic-bezier(.22,.8,.25,1) forwards; }
 @keyframes clerk-pop { 0% { transform: translateY(270px) scale(1.2,.65); } 45% { transform: translateY(-12px) scale(.83,1.14); } 68% { transform: translateY(8px) scale(1.1,.9); } 85% { transform: translateY(-3px) scale(.97,1.04); } 100% { transform: none; } }
-.magazine-button { position: absolute; display: block; padding: 0; border: 0; background: transparent; cursor: pointer; pointer-events: auto; }
+.magazine-button { position: absolute; z-index: 3; display: block; padding: 0; border: 0; background: transparent; cursor: pointer; pointer-events: auto; transform: scale(1.25); transform-origin: 50% 100%; }
 .magazine-button .art-part { pointer-events: none; }
 .magazine-back { opacity: 0; transform: scale(.882); transform-origin: top left; }
 .prop.is-flipped .magazine-front { opacity: 0; }
@@ -346,3 +352,93 @@ button:focus-visible { outline: 3px solid #e9b42f; }
 @keyframes restaurant-glow { 0%,100% { opacity: .45; filter: drop-shadow(0 0 8px #ffe88c); } 50% { opacity: 1; filter: drop-shadow(0 0 23px #ffd352); } }
 .drink-cup { border: 0; background: transparent !important; box-shadow: none; width: 48px; height: 68px; }
 @media (prefers-reduced-motion: reduce) { .real-prop *, .is-aniteez { animation-duration: 1ms !important; animation-iteration-count: 1 !important; } }
+
+/* Street v6 tuning: cheaper offscreen composition and revised interactions. */
+.prop,
+.scene-decor,
+.street-bus {
+  contain: layout paint style;
+  content-visibility: auto;
+}
+.prop--bird { contain: layout style; content-visibility: visible; }
+.real-prop { filter: none; }
+
+.transition-copy {
+  left: 112px;
+  top: auto;
+  bottom: 82px;
+  width: auto;
+  transform: none;
+  text-align: left;
+}
+.transition-copy p {
+  margin: 0 0 12px;
+  color: #4f741d;
+  font-family: Georgia, serif;
+  font-size: 150px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.06em;
+}
+.transition-copy h1 {
+  margin: 0;
+  color: #472817;
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: .18em;
+}
+
+.menu-drink {
+  position: absolute;
+  z-index: 4;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  transition: filter .2s, transform .24s;
+}
+.menu-drink img { position: absolute; display: block; max-width: none; }
+.menu-drink--americano { left: 38.20%; top: 38.69%; width: 10.43%; height: 20.54%; }
+.menu-drink--americano img { left: -80.53%; top: -44.03%; width: 492.31%; height: 317.52%; }
+.menu-drink--tea { left: 64.76%; top: 47.80%; width: 10.63%; height: 20.09%; }
+.menu-drink--tea img { left: -69.66%; top: -31.45%; width: 383.52%; height: 257.61%; }
+.menu-drink--strawberry { left: 48.32%; top: 66.54%; width: 10.35%; height: 22.33%; }
+.menu-drink--strawberry img { inset: 0; width: 100%; height: 100%; }
+.drink-name {
+  color: #472817;
+  font-size: 27px;
+  font-weight: 400;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.drink-rig { left: 732px; top: 640px; }
+.tentacle-rig { left: 748px; }
+
+.has-real-art.prop--gift .real-prop {
+  transform: translateX(-50%) scale(var(--art-scale)) rotate(-4.2deg);
+}
+
+.has-real-art.prop--billboard.is-activated .billboard-art {
+  position: relative;
+  animation: billboard-screen-flash 2.4s ease-in-out;
+}
+.has-real-art.prop--billboard.is-activated .billboard-art::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: #fff;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: billboard-white-wash 2.4s ease-in-out;
+  pointer-events: none;
+}
+@keyframes billboard-screen-flash {
+  0%, 100% { filter: brightness(1); }
+  42%, 62% { filter: brightness(1.55) saturate(.72); }
+}
+@keyframes billboard-white-wash {
+  0%, 100% { opacity: 0; }
+  42%, 62% { opacity: .34; }
+}
