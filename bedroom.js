@@ -231,7 +231,7 @@ function openCurtains() {
   setBedroomState("openingCurtains");
   bedroomScene.classList.remove("is-curtain-ready", "is-curtain-hint");
   bedroomScene.classList.add("is-curtains-open");
-  schedule(() => bedroomScene.classList.add("is-light-on"), 900);
+  schedule(() => bedroomScene.classList.add("is-light-on"), 1550);
   schedule(() => {
     bedroomScene.classList.add("is-sleep-interactive");
     setBedroomState("sleepClicks");

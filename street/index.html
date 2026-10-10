@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f2efe7" />
+    <title>ORBIT 10.12 — 长街灰盒 v5</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app" aria-label="长街散步">
+      <section id="stage" class="stage" aria-live="polite">
+        <div id="sceneCamera" class="scene-camera">
+          <div class="paper-bg" aria-hidden="true"></div>
+          <div id="streetWorld" class="street-world">
+            <div id="skyWorldLayer" class="sky-world-layer" aria-hidden="true"></div>
+            <svg id="roadSvg" class="road-svg" viewBox="0 0 44400 1080" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <pattern id="roadTexture" patternUnits="userSpaceOnUse" width="1754" height="110">
+                  <image href="./assets/street-road-fill.png" width="1754" height="110" preserveAspectRatio="none"></image>
+                </pattern>
+                <filter id="paperShadow" x="-20%" y="-30%" width="140%" height="190%">
+                  <feDropShadow dx="0" dy="34" stdDeviation="20" flood-color="#16372a" flood-opacity="0.38" />
+                </filter>
+              </defs>
+              <g id="roadCopies" filter="url(#paperShadow)"></g>
+            </svg>
+            <div id="oceanLayer" class="ocean-layer"></div>
+            <div id="propsLayer" class="props-layer"></div>
+          </div>
+
+          <div id="characterRig" class="character-rig" aria-label="行走人物">
+            <div class="character-stick" aria-hidden="true"></div>
+            <div id="characterBob" class="character-bob">
+              <img id="characterImage" alt="当前服装人物" draggable="false" />
+            </div>
+          </div>
+
+          <div id="drinkRig" class="drink-rig is-hidden" aria-hidden="true">
+            <div class="drink-stick"></div>
+            <div id="drinkCup" class="drink-cup"><span>DRINK</span></div>
+          </div>
+
+          <div id="tentacleRig" class="tentacle-rig is-hidden" aria-hidden="true">
+            <img src="./assets/street-tentacle-reward.png" alt="" draggable="false" />
+          </div>
+
+          <div id="pirateHatRig" class="pirate-hat-rig is-retracted" aria-hidden="true">
+            <img class="pirate-hat" src="./assets/street-hat-display.png" alt="" draggable="false" />
+          </div>
+          <div id="pirateShipRig" class="pirate-ship-rig is-retracted" aria-hidden="true">
+            <div class="accessory-stick"></div>
+            <img class="pirate-ship" src="./assets/street-ship-display.png" alt="" draggable="false" />
+          </div>
+
+          <div id="foregroundWorld" class="foreground-world" aria-hidden="true"></div>
+
+          <div id="dialogueSign" class="dialogue-sign" role="status">
+            <div class="dialogue-stick"></div>
+            <img class="dialogue-paper" src="./assets/street-text-display.png" alt="" draggable="false" />
+            <p id="dialogueText"></p>
+          </div>
+        </div>
+
+        <header class="hud">
+          <div class="hud-time">11:00</div>
+          <button id="soundButton" class="hud-button" type="button" aria-label="切换声音">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 16h7l9-8v24l-9-8H7zM28 14c3 3 3 9 0 12M32 10c6 6 6 14 0 20" /></svg>
+          </button>
+          <button id="backButton" class="hud-button" type="button" aria-label="返回上一幕">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 8 12 20l12 12M13 20h20" /></svg>
+          </button>
+        </header>
+
+        <div class="control-hint">
+          <span class="mouse-hint" data-copy="滚轮控制前后移动">滚轮控制前后移动</span>
+          <span class="touch-hint" data-copy="左右滑动控制前后移动">左右滑动控制前后移动</span>
+          <i></i>
+        </div>
+
+        <div id="coffeeOverlay" class="scene-overlay coffee-overlay" aria-hidden="true">
+          <section id="coffeeMenu" class="coffee-menu" aria-label="选择饮品">
+            <img class="menu-layer menu-background" src="./assets/menu-background.png" alt="今日饮品菜单" draggable="false" />
+            <img class="menu-layer menu-drink menu-drink--americano" src="./assets/menu-americano.png" alt="" draggable="false" />
+            <img class="menu-layer menu-drink menu-drink--tea" src="./assets/menu-tea.png" alt="" draggable="false" />
+            <img class="menu-layer menu-drink menu-drink--strawberry" src="./assets/menu-strawberry.png" alt="" draggable="false" />
+            <img id="menuWalker" class="menu-walker" alt="当前服装人物" draggable="false" />
+            <img id="menuBear" class="menu-layer menu-bear" alt="饮品反应" draggable="false" />
+            <p id="menuBearText" class="menu-bear-text"></p>
+            <button class="drink-hotspot hotspot--americano" type="button" data-drink="americano" aria-label="选择美式咖啡"></button>
+            <button class="drink-hotspot hotspot--tea" type="button" data-drink="chamomile" aria-label="选择洋甘菊茶"></button>
+            <button class="drink-hotspot hotspot--strawberry" type="button" data-drink="strawberry" aria-label="选择草莓奶昔"></button>
+            <span class="drink-name name--americano" data-copy="美式咖啡">美式咖啡</span>
+            <span class="drink-name name--tea" data-copy="洋甘菊茶">洋甘菊茶</span>
+            <span class="drink-name name--strawberry" data-copy="草莓奶昔">草莓奶昔</span>
+            <i class="doodle-star star--one">✦</i>
+            <i class="doodle-star star--two">☆</i>
+            <i class="doodle-star star--three">✧</i>
+            <button id="confirmDrink" class="confirm-drink" type="button" disabled data-copy="TAKE IT">TAKE IT</button>
+          </section>
+        </div>
+
+        <div id="restaurantOverlay" class="scene-overlay restaurant-overlay" aria-hidden="true">
+          <section class="restaurant-card">
+
+            <h2 data-copy="午餐时间">午餐时间</h2>
+            <p data-copy="先在这里歇一会儿吧~">先在这里歇一会儿吧~</p>
+            <button id="closeRestaurant" class="paper-button" type="button" data-copy="继续散步">继续散步</button>
+          </section>
+        </div>
+
+        <section id="transition" class="transition is-active" aria-label="场景转场">
+          <video id="transitionVideo" muted autoplay playsinline preload="auto">
+            <source src="./assets/street-transition.mp4" type="video/mp4" />
+          </video>
+          <div class="transition-copy">
+            <p>11:00</p>
+            <h1 data-copy="街上">街上</h1>
+            <span data-copy="ON THE STREET">ON THE STREET</span>
+          </div>
+          <button id="skipTransition" type="button" data-copy="SKIP">SKIP</button>
+        </section>
+
+        <div class="rotate-note"><span data-copy="横屏观看效果更完整">横屏观看效果更完整</span><br /><small data-copy="请旋转手机">请旋转手机</small></div>
+      </section>
+    </main>
+    <script src="./copy.js"></script>
+    <script src="./scenery.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

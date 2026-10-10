@@ -80,7 +80,7 @@ GitHub Pages 不直接支持 Git LFS 文件；本次只建立源码仓库。后�
 
 ## 下一场景衔接
 
-确认服装后点击卧室人物，显示午餐邀请对白 6.5 秒，然后发出 `orbit-next-scene-request` 事件，`detail` 为 `{ from: "bedroom", next: "lunch", outfit: confirmedOutfit }`。下一场景尚未实现，所以目前保留卧室画面；后续场景可监听该事件接入转场。
+确认服装返回卧室后，8 秒未点击人物会显示头顶的手势提示。点击人物显示午餐邀请并淡入“出发”按钮；点击“出发”才发出 `orbit-next-scene-request`，`detail` 为 `{ from: "bedroom", next: "lunch", outfit: confirmedOutfit }`，由 `street.js` 接入长街转场。长街返回按钮保留确认服装并回到卧室。
 
 连续点击人物会重新计时，只触发一次请求；其他对白、衣柜操作或退出卧室会取消待处理请求。三语文案分别位于 `bedroomCopy.lunchInvite` 和 `dressupCopy.pajamaQuestion`。
 
@@ -121,7 +121,7 @@ assets/menu-bg.gif
 
 | 字段 | 含义 | 主要写入位置 |
 | --- | --- | --- |
-| `currentScene` | `menu` / `bedroom` / `dressup`，不表示过渡动画已完成 | 三个场景的进入与返回函数 |
+| `currentScene` | `menu` / `bedroom` / `dressup` / `street`，不表示过渡动画已完成 | 三个场景的进入与返回函数 |
 | `bedroomState` | 卧室详细互动阶段 | `bedroom.js` 的 `setBedroomState()` |
 | `wardrobeState` | `closed` / `open`，返回卧室时保留开门状态 | 卧室衣柜逻辑 |
 | `characterState` | `sleeping` / `wakeQueued` / `waking` / `awake` / `dressed` | 卧室人物逻辑 |
@@ -135,3 +135,16 @@ assets/menu-bg.gif
 语言与 BGM 由 `orbitMenu` 管理，通过 `orbit-language-change` 和 `orbit-bgm-change` 同步。状态仅保存在内存中，刷新页面会重置。
 
 后续新增场景应复用共享状态，并由场景退出函数清理自己的异步任务。布局、热点与动画类名继续由对应场景管理。
+
+
+## Street 场景（整合自灰盒 v5）
+
+- `street.js`：卧室“出发”事件、独立场景生命周期、服装/语言/声音/饮品状态衔接。
+- `street/index.html`、`street/styles.css`、`street/app.js`：原灰盒的散步、咖啡菜单、海洋、章鱼与循环机制。通过同源 iframe 隔离样式，退出时卸载页面，释放动画和计时器。
+- `street/scenery.js`：正式素材的同画布坐标、独立图层和杂志透明像素命中判定。
+- `street/copy.js`：长街互动与界面中、英、韩三语；沿用前几幕字体和纸色、棕色、绿色。
+- `street/assets/supplement/`：完整保留补充素材包（包括参考图），不覆盖菜单/卧室/换装素材。
+
+电脑使用滚轮前后散步，手机横屏左右拖动。猫和店员每次进入视野只触发一次，完全离开视野后重新启用；八个 ANITEEZ 路过时弹动。KQ 门打开动画 650ms、停留 2s、自动关闭，离开门口后可再次触发。路过橱窗/杂志架使熊/杂志轻抖，只有杂志自身的不透明区域可翻页。广告牌增强光晕；餐厅招牌缓缓发光，风铃晃动并发声。翻页和风铃声音使用 Web Audio 本地合成，受统一声音开关控制。
+
+`confirmedOutfit` 的 `cuteez/plaid/henley` 映射为灰盒的 `cuteez/striped/plaid`，保持已有服装图案一致。饮品写入共享 `selectedDrink`；新循环、新次进入长街和海洋丢弃饮品时复位。餐厅弹窗保留本幕出口，餐厅内下一幕尚未实现。

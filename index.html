@@ -73,7 +73,7 @@
             <div class="room-sprite-layer bright-layer humidifier-layer" style="--sprite-x:46%;--sprite-y:82.5036%;--sprite-w:8.68%;--sprite-h:17.4964%"><img src="assets/bedroom/trim/humidifier.png" alt="" draggable="false" /></div>
             <div class="room-sprite-layer bright-layer computer-layer" style="--sprite-x:86.48%;--sprite-y:51.2091%;--sprite-w:13.52%;--sprite-h:47.5818%"><img src="assets/bedroom/trim/computer.png" alt="" draggable="false" /></div>
             <div class="room-sprite-layer bright-layer phone-layer" style="--sprite-x:33.68%;--sprite-y:64.1536%;--sprite-w:3.8%;--sprite-h:7.2546%"><img src="assets/bedroom/trim/phone.png" alt="" draggable="false" /></div>
-            <div class="room-sprite-layer bright-layer wardrobe-closed-layer" style="--sprite-x:81.28%;--sprite-y:9.3883%;--sprite-w:10.2%;--sprite-h:66.0028%"><img src="assets/bedroom/trim/wardrobe-door-closed.png" alt="" draggable="false" /></div>
+            <div class="room-sprite-layer bright-layer wardrobe-closed-layer" style="--sprite-x:81.28%;--sprite-y:9.3883%;--sprite-w:10.2%;--sprite-h:66.0028%"><img class="wardrobe-door-dark" src="assets/bedroom/trim/wardrobe-door-dark.png" alt="" draggable="false" /><img class="wardrobe-door-light" src="assets/bedroom/trim/wardrobe-door-closed.png" alt="" draggable="false" /></div>
             <div class="room-sprite-layer bright-layer wardrobe-open-layer" style="--sprite-x:74.28%;--sprite-y:10.6686%;--sprite-w:7.24%;--sprite-h:64.2248%"><img src="assets/bedroom/trim/wardrobe-door-open.png" alt="" draggable="false" /></div>
 
             <div class="curtain-glow" aria-hidden="true"></div>
@@ -109,7 +109,7 @@
               <p></p>
             </div>
 
-            <div class="bedroom-character-hint" aria-hidden="true"><span>🫳</span></div>
+            <div class="bedroom-character-hint" aria-hidden="true"><span><img src="assets/bedroom/hand-palm-down.svg" alt="" draggable="false" /></span></div>
             <button class="bedroom-depart-button" type="button" aria-hidden="true" disabled>出发</button>
 
             <p class="bedroom-time" aria-label="Time">10:12</p>
@@ -226,6 +226,7 @@
           </div>
         </section>
 
+        <section class="street-scene" aria-hidden="true"><iframe title="Street" allow="autoplay"></iframe></section>
         <div class="scene-return-mask" aria-hidden="true"></div>
       </section>
 
@@ -240,5 +241,6 @@
     <script src="script.js"></script>
     <script src="bedroom.js"></script>
     <script src="dressup.js"></script>
+    <script src="street.js"></script>
   </body>
 </html>

@@ -106,6 +106,7 @@ function startGame() {
 
 function resetMenu() {
   window.clearTimeout(transitionTimer);
+  window.resetStreetScene?.();
   window.resetDressupScene?.();
   window.resetBedroomScene?.();
   window.orbitGameState.currentScene = "menu";

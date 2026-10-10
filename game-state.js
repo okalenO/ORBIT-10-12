@@ -1,6 +1,6 @@
 // Shared gameplay data only. Each scene owns its DOM, dialogue and animation timers.
 window.orbitGameState = Object.assign({
-  currentScene: "menu", // menu | bedroom | dressup
+  currentScene: "menu", // menu | bedroom | dressup | street
   bedroomState: "inactive", // detailed bedroom interaction phase
   wardrobeState: "closed", // closed | open
   characterState: "sleeping", // sleeping | wakeQueued | waking | awake | dressed
@@ -8,4 +8,5 @@ window.orbitGameState = Object.assign({
   confirmedOutfit: null, // outfit committed to the bedroom character
   previewOutfit: null, // temporary bear preview; never confirmed
   bearUnlocked: false,
+  selectedDrink: null,
 }, window.orbitGameState || {});

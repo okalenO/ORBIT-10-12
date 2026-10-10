@@ -407,7 +407,7 @@
   transform: translateX(0) scaleX(1);
 }
 
-.bedroom-scene.is-light-on .light-rays {
+.bedroom-scene.is-curtains-open.is-light-on .light-rays {
   opacity: 0.64;
 }
 
@@ -1030,12 +1030,11 @@ html[lang="ko"] .character-bubble p {
 .character-bubble p { white-space: pre-line; }
 
 /* Closed curtains and doors are already present in the corrected dark image. */
-.bedroom-scene:not(.is-curtains-open) .curtain-layer,
-.bedroom-scene:not(.is-curtains-open) .wardrobe-closed-layer,
-.bedroom-scene:not(.is-curtains-open) .wardrobe-open-layer { visibility: hidden; }
+.bedroom-scene:not(.is-curtains-open) .curtain-layer { visibility: hidden; }
 .bedroom-character-hint {
-  position: absolute; left: 44.45%; top: 50%; z-index: 10;
+  position: absolute; left: 44.45%; top: 60%; z-index: 10;
   transform: translateX(-50%); font-size: clamp(24px, 3vw, 56px);
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
   pointer-events: none; opacity: 0; transition: opacity 1600ms ease;
 }
 .bedroom-character-hint.is-visible { opacity: 1; }
@@ -1046,7 +1045,7 @@ html[lang="ko"] .character-bubble p {
   0%, 100% { opacity: 0.25; } 50% { opacity: 1; }
 }
 .bedroom-scene .bedroom-depart-button {
-  left: 24%; right: auto; bottom: 10%; opacity: 0;
+  left: auto; right: 64%; bottom: 22%; opacity: 0;
   visibility: hidden; pointer-events: none;
   transition: opacity 1600ms ease, visibility 0s 1600ms;
 }
@@ -1097,3 +1096,22 @@ html[lang="ko"] .bedroom-depart-button {
 
 
 .bedroom-depart-button { color: var(--leaf); }
+
+/* Keep rays hidden until the curtains finish opening. */
+.bedroom-scene:not(.is-curtains-open) .light-rays,
+.bedroom-scene:not(.is-light-on) .light-rays { visibility: hidden; }
+
+/* Match the room fade; retain the faster door transitions once awake. */
+.bedroom-scene:not(.is-awake) .wardrobe-closed-layer {
+  transition: transform 920ms cubic-bezier(0.42, 0.02, 0.24, 1), opacity 2800ms ease;
+}
+
+.bedroom-character-hint img { display: block; width: 1em; height: 1em; }
+
+/* Keep an opaque dark door beneath the light door during the room fade. */
+.wardrobe-closed-layer { opacity: 1; }
+.wardrobe-closed-layer > .wardrobe-door-light {
+  opacity: 0;
+  transition: opacity 2800ms ease;
+}
+.bedroom-scene.is-curtains-open .wardrobe-door-light { opacity: 1; }
