@@ -106,10 +106,15 @@ function startGame() {
 
 function resetMenu() {
   window.clearTimeout(transitionTimer);
+  window.resetBeachScene?.();
+  window.resetRestaurantScene?.();
   window.resetStreetScene?.();
   window.resetDressupScene?.();
   window.resetBedroomScene?.();
   window.orbitGameState.currentScene = "menu";
+  window.orbitGameState.selectedDrink = null;
+  window.orbitGameState.restaurantResult = null;
+  window.orbitGameState.beachResult = null;
   stage.classList.remove("is-bedroom", "is-transitioning", "is-dressup");
 }
 

@@ -72,7 +72,7 @@
           </section>
 
           <div class="hud">
-            <span class="hud-time">12:00</span>
+            <span class="hud-time">12:30</span>
             <button id="soundButton" class="hud-button sound-button" type="button" aria-label="切换背景音乐" aria-pressed="true">
               <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20h9l10-8v24l-10-8H8z"/><path class="sound-wave" d="M33 17c3 4 3 10 0 14M38 12c6 7 6 17 0 24"/></svg>
             </button>
@@ -80,8 +80,6 @@
               <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 10 8 24l13 14"/><path d="M10 24h19c8 0 11 5 11 12"/></svg>
             </button>
           </div>
-          <button id="languageButton" class="language-button" type="button" aria-label="切换语言">中文</button>
-
           <div class="bottom-action-wrap">
             <button id="mainAction" class="main-action is-hidden" type="button"></button>
           </div>
@@ -124,12 +122,15 @@
 
         <section id="transition" class="transition is-active" aria-label="场景转场">
           <div class="transition-paper" aria-hidden="true"></div>
-          <p class="transition-time">12:00</p>
+          <p class="transition-time">12:30</p>
           <p class="transition-place" data-i18n="transitionPlace">餐厅</p>
         </section>
 
         <section id="nextScene" class="next-scene" aria-hidden="true">
-          <p data-i18n="nextPlaceholder">下一幕待接入</p>
+          <div class="next-transition-copy">
+            <p class="next-transition-time">15:00</p>
+            <p class="next-transition-place" data-i18n="beachTransitionPlace">海边</p>
+          </div>
         </section>
 
         <div class="rotate-note">横屏观看效果更完整<br /><small>请旋转手机</small></div>

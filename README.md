@@ -1,6 +1,6 @@
-# ORBIT 10:12｜菜单 + 卧室 + 换装
+# ORBIT 10:12｜菜单 + 卧室 + 换装 + 长街 + 餐厅 + 海滩
 
-这是一个无需安装依赖的静态网页原型，已经把主菜单、卧室和换装小游戏连在一起。
+这是一个无需安装依赖的静态网页游戏，已连接主菜单、卧室、换装、长街、餐厅和海滩拍照场景。
 
 ## 启动方式
 
@@ -46,6 +46,9 @@ GitHub Pages 不直接支持 Git LFS 文件；本次只建立源码仓库。后�
 15. 换装返回按钮不提交试穿结果；再次进入会恢复上次普通服装选择
 16. 从换装返回后衣柜门保持打开；点击打开的门板关门，点击柜内衣服可再次进入换装
 17. 卧室返回按钮回到主菜单并清空本轮游戏进度，保留当前语言和音乐开关
+18. 确认出发后进入 `11:30` 长街，选择饮品并到达餐厅
+19. 进入 `12:30` 餐厅，完成点餐、蛋糕装饰和贺卡后出发
+20. 进入 `15:00` 海滩，可在同一周目拍摄并保存多张照片；后续场景只使用第一张已确认照片的数据
 
 ## 已实现的互动
 
@@ -114,6 +117,10 @@ assets/menu-bg.gif
 - `bedroom.js`：卧室状态机、对白和互动逻辑
 - `dressup.css`：换装场景、衣物联动和人物切换动画
 - `dressup.js`：换装状态、拖拽物理、隐藏服装与三语对白
+- `street/`：长街场景、饮品选择和街景互动
+- `restaurant/`：餐厅点餐、蛋糕和贺卡流程
+- `beach/`：海滩拍照、边框、多张保存和拍立得导出
+- `street.js` / `restaurant.js` / `beach.js`：顶层场景生命周期、淡入淡出与共享状态衔接
 
 ## 状态与场景边界
 
@@ -121,7 +128,7 @@ assets/menu-bg.gif
 
 | 字段 | 含义 | 主要写入位置 |
 | --- | --- | --- |
-| `currentScene` | `menu` / `bedroom` / `dressup` / `street`，不表示过渡动画已完成 | 三个场景的进入与返回函数 |
+| `currentScene` | `menu` / `bedroom` / `dressup` / `street` / `restaurant` / `beach`，不表示过渡动画已完成 | 各场景的进入与返回函数 |
 | `bedroomState` | 卧室详细互动阶段 | `bedroom.js` 的 `setBedroomState()` |
 | `wardrobeState` | `closed` / `open`，返回卧室时保留开门状态 | 卧室衣柜逻辑 |
 | `characterState` | `sleeping` / `wakeQueued` / `waking` / `awake` / `dressed` | 卧室人物逻辑 |
@@ -129,6 +136,9 @@ assets/menu-bg.gif
 | `confirmedOutfit` | 已确认并应用到卧室的服装 | 换装确认逻辑 |
 | `previewOutfit` | 临时熊服预览，不允许确认 | 换装预览逻辑 |
 | `bearUnlocked` | 隐藏服装是否解锁 | 换装箱子逻辑 |
+| `selectedDrink` | 长街中已确认的饮品 | 长街饮品菜单 |
+| `restaurantResult` | 餐厅点餐、蛋糕和贺卡数据 | 餐厅场景 |
+| `beachResult` | 本周目第一张已确认的海滩照片 | 海滩场景 |
 
 `getDressupConfirmedOutfit()` 返回共享状态中的 `confirmedOutfit`。服装 ID 为 `cuteez`、`plaid`、`henley`；现有素材映射保留，`plaid` 使用 `character-striped.png`，`henley` 使用 `character-plaid.png`。
 
@@ -147,4 +157,11 @@ assets/menu-bg.gif
 
 电脑使用滚轮前后散步，手机横屏左右拖动。猫和店员每次进入视野只触发一次，完全离开视野后重新启用；八个 ANITEEZ 路过时弹动。KQ 门打开动画 650ms、停留 2s、自动关闭，离开门口后可再次触发。路过橱窗/杂志架使熊/杂志轻抖，只有杂志自身的不透明区域可翻页。广告牌增强光晕；餐厅招牌缓缓发光，风铃晃动并发声。翻页和风铃声音使用 Web Audio 本地合成，受统一声音开关控制。
 
-`confirmedOutfit` 的 `cuteez/plaid/henley` 映射为灰盒的 `cuteez/striped/plaid`，保持已有服装图案一致。饮品写入共享 `selectedDrink`；新循环、新次进入长街和海洋丢弃饮品时复位。餐厅弹窗保留本幕出口，餐厅内下一幕尚未实现。
+`confirmedOutfit` 的 `cuteez/plaid/henley` 映射为灰盒的 `cuteez/striped/plaid`，保持已有服装图案一致。饮品写入共享 `selectedDrink`；新循环、新次进入长街和海洋丢弃饮品时复位。餐厅的“走吧”现在直接衔接海滩纸张转场。
+
+## Beach 场景（整合自灰盒 v1）
+
+- 餐厅结束后淡入 `15:00 / 海边`，字体、纸色、棕色和绿色与卧室及餐厅转场一致。
+- 转场复用 `street/assets/audio/wind-chime.mp3`，之后海浪声渐入。
+- 玩家可选择三种拍立得边框，导出时锁定当前选择的实际边框文件。
+- 完成后可选择“再拍一张”，同一周目可保存多张；`window.ORBIT_BEACH_RESULT`、`orbit:beachPhoto` 和共享 `beachResult` 始终保留第一张已确认照片。

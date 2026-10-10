@@ -7,9 +7,10 @@
   let language = settings.language;
   const STAGE_W = 1920;
   const STAGE_H = 1080;
+  const ROAD_RENDER_SCALE = 0.5;
+  const MAX_ACTIVE_LEAVES = 10;
   const TRACK_W = 14800;
   const PLAYER_X = 656;
-  const ROAD_BOTTOM = 1350;
   const CHARACTER_SCALE = 0.44;
   const COPIES = [0, TRACK_W, TRACK_W * 2];
   const OCEAN_START = 8750;
@@ -21,8 +22,8 @@
   const stage = $("#stage");
   const sceneCamera = $("#sceneCamera");
   const world = $("#streetWorld");
-  const roadSvg = $("#roadSvg");
-  const roadCopies = $("#roadCopies");
+  const roadCanvas = $("#roadCanvas");
+  const roadContext = roadCanvas.getContext("2d", { alpha: true });
   const skyWorldLayer = $("#skyWorldLayer");
   const oceanLayer = $("#oceanLayer");
   const propsLayer = $("#propsLayer");
@@ -50,8 +51,6 @@
   pageTurnAudio.preload = "auto";
   chimeAudio.preload = "auto";
 
-  roadSvg.setAttribute("viewBox", `0 0 ${TRACK_W * 3} 1350`);
-  roadSvg.style.width = `${TRACK_W * 3}px`;
   world.style.width = `${TRACK_W * 3}px`;
   foregroundLayer.style.width = `${TRACK_W * 3}px`;
 
@@ -128,6 +127,7 @@
     hasTentacle: false,
     overlayOpen: false,
     transitionActive: true,
+    paused: Boolean(settings.paused),
     soundOn: settings.sound,
     pointerDown: false,
     pointerDragged: false,
@@ -137,14 +137,19 @@
     magazineDialogueShown: false,
     lastInteractionX: NaN,
     lastInteractionTime: 0,
+    lastRoadX: NaN,
     lastTime: performance.now(),
     look: { x: 0, y: 0, targetX: 0, targetY: 0 },
     activation: new Map(sceneItems.map((item) => [item.id, { armed: true, nearAnnounced: false }])),
+    aniteezActivation: new Map(sceneDecor.flatMap((item, index) => item.kind === "aniteez"
+      ? [[String(index), { x: item.x, armed: true, lastDelta: null }]] : [])),
   };
   const propCache = new Map();
   const itemHalfWidths = new Map();
   let aniteezElements = [];
+  const aniteezGroups = new Map();
   let worldVisuals = [];
+  let transitionFallbackTimer;
 
   function propsFor(id) {
     if (!propCache.has(id)) propCache.set(id, Array.from($$(`.prop[data-id="${id}"]`)));
@@ -157,9 +162,15 @@
       itemHalfWidths.set(item.id, Math.max(...props.map(prop => prop.offsetWidth / 2)));
     });
     aniteezElements = Array.from($$(".is-aniteez"));
+    aniteezElements.forEach((element) => {
+      const id = element.dataset.aniteezId;
+      if (!aniteezGroups.has(id)) aniteezGroups.set(id, []);
+      aniteezGroups.get(id).push(element);
+    });
     worldVisuals = Array.from($$(".prop,.scene-decor,.world-cloud,.world-balloon")).map(element => ({
       element,
       x: Number.parseFloat(element.style.left) || 0,
+      visible: null,
     }));
     updateVisibleWorld(mod(state.position, TRACK_W));
   }
@@ -169,7 +180,10 @@
     const minX = worldCenter - PLAYER_X - 900;
     const maxX = worldCenter + (STAGE_W - PLAYER_X) + 900;
     worldVisuals.forEach(entry => {
-      entry.element.style.visibility = entry.x >= minX && entry.x <= maxX ? "visible" : "hidden";
+      const visible = entry.x >= minX && entry.x <= maxX;
+      if (entry.visible === visible) return;
+      entry.visible = visible;
+      entry.element.style.visibility = visible ? "visible" : "hidden";
     });
   }
 
@@ -206,29 +220,55 @@
     return Math.atan((routeY(x + sample) - routeY(x - sample)) / (sample * 2)) * 180 / Math.PI;
   }
 
-  function makeLinePath(offsetX) {
-    const points = [];
-    for (let x = 0; x < TRACK_W; x += 36) points.push(`${x + offsetX},${routeY(x).toFixed(2)}`);
-    points.push(`${TRACK_W + offsetX},${routeY(TRACK_W).toFixed(2)}`);
-    return `M ${points.join(" L ")}`;
+  const roadTextureImage = new Image();
+  let roadPattern = null;
+  roadTextureImage.src = "./assets/street-road-fill.png";
+  roadTextureImage.addEventListener("load", () => {
+    roadPattern = roadContext.createPattern(roadTextureImage, "repeat");
+    state.lastRoadX = NaN;
+  });
+
+  function traceRoad(localX, yOffset = 0) {
+    roadContext.beginPath();
+    for (let screenX = -48; screenX <= STAGE_W + 48; screenX += 28) {
+      const y = routeY(localX + screenX - PLAYER_X) + yOffset;
+      if (screenX === -48) roadContext.moveTo(screenX, y);
+      else roadContext.lineTo(screenX, y);
+    }
   }
 
-  function makeFillPath(offsetX) {
-    return `${makeLinePath(offsetX)} L ${TRACK_W + offsetX},${ROAD_BOTTOM} L ${offsetX},${ROAD_BOTTOM} Z`;
-  }
-
-  function buildRoad() {
-    const points = [];
-    const total = TRACK_W * COPIES.length;
-    for (let x = 0; x < total; x += 36) points.push(`${x},${routeY(x).toFixed(2)}`);
-    points.push(`${total},${routeY(total).toFixed(2)}`);
-    const linePath = `M ${points.join(" L ")}`;
-    const fillPath = `${linePath} L ${total},${ROAD_BOTTOM} L 0,${ROAD_BOTTOM} Z`;
-    roadCopies.innerHTML = `
-      <path class="road-fill" d="${fillPath}"></path>
-      <path class="road-wash" d="${fillPath}"></path>
-      <path class="road-edge" d="${linePath}"></path>
-      <path class="road-stitch" d="${linePath}" transform="translate(0 18)"></path>`;
+  function drawRoad(localX) {
+    if (Math.abs(localX - state.lastRoadX) < .8) return;
+    state.lastRoadX = localX;
+    roadContext.setTransform(1, 0, 0, 1, 0, 0);
+    roadContext.clearRect(0, 0, roadCanvas.width, roadCanvas.height);
+    roadContext.setTransform(ROAD_RENDER_SCALE, 0, 0, ROAD_RENDER_SCALE, 0, 0);
+    traceRoad(localX);
+    roadContext.lineTo(STAGE_W + 48, STAGE_H);
+    roadContext.lineTo(-48, STAGE_H);
+    roadContext.closePath();
+    if (roadPattern) {
+      if (roadPattern.setTransform) roadPattern.setTransform(new DOMMatrix().translate(mod(PLAYER_X - localX, 1754), 0));
+      roadContext.fillStyle = roadPattern;
+    } else {
+      roadContext.fillStyle = "#d8cfae";
+    }
+    roadContext.fill();
+    roadContext.fillStyle = "rgba(82,125,50,.23)";
+    roadContext.fill();
+    traceRoad(localX);
+    roadContext.strokeStyle = "rgba(36,32,31,.72)";
+    roadContext.lineWidth = 6;
+    roadContext.lineCap = "round";
+    roadContext.lineJoin = "round";
+    roadContext.setLineDash([]);
+    roadContext.stroke();
+    traceRoad(localX, 18);
+    roadContext.strokeStyle = "rgba(255,249,226,.48)";
+    roadContext.lineWidth = 3;
+    roadContext.setLineDash([11, 27]);
+    roadContext.stroke();
+    roadContext.setLineDash([]);
   }
 
   function bouncePart(props, selector) {
@@ -307,12 +347,15 @@
       bike.style.top = `${routeY(2770) + 6}px`;
       fragment.appendChild(bike);
 
-      sceneDecor.forEach((item) => {
+      sceneDecor.forEach((item, decorIndex) => {
         const decor = document.createElement("img");
         const grass = item.asset.includes("grass");
         decor.className = `scene-decor is-${item.layer}${item.flip ? " is-flipped" : ""}${grass ? " is-grass" : ""}${item.kind === "aniteez" ? " is-aniteez" : ""}`;
         decor.src = `./assets/${item.asset}`;
-        if (item.kind === "aniteez") decor.dataset.worldX = item.x;
+        if (item.kind === "aniteez") {
+          decor.dataset.worldX = item.x;
+          decor.dataset.aniteezId = String(decorIndex);
+        }
         decor.alt = "";
         decor.draggable = false;
         decor.style.left = `${item.x + copyOffset}px`;
@@ -456,6 +499,7 @@
     tentacleRig.classList.remove("is-popping");
     drinkCup.removeAttribute("data-drink");
     state.activation.forEach((entry) => { entry.armed = true; entry.nearAnnounced = false; entry.doorArmed = true; });
+    state.aniteezActivation.forEach((entry) => { entry.armed = true; entry.lastDelta = null; });
     $$(".prop").forEach((prop) => prop.classList.remove("is-activated", "is-flipped", "is-near", "cat-switched", "clerk-visible", "sign-lit", "doors-open", "bird-departed"));
     flyingBird.classList.remove("is-flying");
     $$(".octopus").forEach((octopus) => octopus.classList.remove("is-defeated"));
@@ -509,19 +553,23 @@
   }
 
   function createLeaves(treeX) {
-    COPIES.forEach((copyOffset) => {
-      for (let i = 0; i < 3; i += 1) {
-        const leaf = document.createElement("span");
-        leaf.className = "leaf";
-        leaf.style.left = `${treeX + copyOffset - 70 + i * 65}px`;
-        leaf.style.top = `${routeY(treeX) - 310 + i * 22}px`;
-        leaf.style.setProperty("--leaf-x", `${50 + i * 55}px`);
-        leaf.style.setProperty("--leaf-y", `${250 + i * 30}px`);
-        leaf.style.setProperty("--leaf-r", `${120 + i * 95}deg`);
-        propsLayer.appendChild(leaf);
-        window.setTimeout(() => leaf.remove(), 7200);
-      }
-    });
+    let activeLeaves = propsLayer.querySelectorAll(".leaf").length;
+    if (activeLeaves >= MAX_ACTIVE_LEAVES) {
+      propsLayer.querySelectorAll(".leaf").forEach((leaf) => leaf.remove());
+      activeLeaves = 0;
+    }
+    const leafCount = Math.min(4, MAX_ACTIVE_LEAVES - activeLeaves);
+    for (let i = 0; i < leafCount; i += 1) {
+      const groundIndex = activeLeaves + i;
+      const leaf = document.createElement("span");
+      leaf.className = "leaf";
+      leaf.style.left = `${treeX + TRACK_W - 112 + (groundIndex % 5) * 47}px`;
+      leaf.style.top = `${routeY(treeX) - 320 + i * 18}px`;
+      leaf.style.setProperty("--leaf-x", `${30 + (groundIndex % 4) * 38}px`);
+      leaf.style.setProperty("--leaf-y", `${295 + (groundIndex % 3) * 12}px`);
+      leaf.style.setProperty("--leaf-r", `${95 + groundIndex * 61}deg`);
+      propsLayer.appendChild(leaf);
+    }
   }
 
   function handleItemClick(item) {
@@ -613,6 +661,7 @@
     restaurantOverlay.classList.remove("is-open");
     restaurantOverlay.setAttribute("aria-hidden", "true");
     state.overlayOpen = false;
+    stage.classList.add("is-handing-off");
     if (bridge?.enterRestaurant) bridge.enterRestaurant();
     else closeRestaurant();
   }
@@ -661,12 +710,12 @@
       drinkRig.classList.add("is-tossing");
       window.setTimeout(() => {
         drinkRig.classList.add("is-hidden");
-        drinkRig.classList.remove("is-tossing");
         state.selectedDrink = null;
         bridge?.setDrink(null);
         drinkCup.removeAttribute("data-drink");
         try { localStorage.removeItem("orbit:drinkId"); } catch (_error) {}
         revealTentacleReward();
+        window.setTimeout(() => drinkRig.classList.remove("is-tossing"), 320);
       }, 2180);
     } else {
       revealTentacleReward();
@@ -690,6 +739,7 @@
       const props = propsFor(item.id);
       const half = itemHalfWidths.get(item.id) || 250;
       const visible = PLAYER_X + delta + half > 0 && PLAYER_X + delta - half < STAGE_W;
+      if (item.trigger === "near" && distance > (item.resetDistance || 520)) entry.armed = true;
       props.forEach(prop => {
         prop.classList.toggle("is-near", distance < 500);
         prop.style.pointerEvents = ((item.trigger === "click" && distance < 570) || item.trigger === "hover" || item.id === "restaurant") ? "auto" : "none";
@@ -724,15 +774,22 @@
         }
       }
     });
-    aniteezElements.forEach(decor => {
-      const delta = circularDelta(Number(decor.dataset.worldX), localX);
-      const visible = PLAYER_X + delta + 90 > 0 && PLAYER_X + delta - 90 < STAGE_W;
-      if (!visible) decor.dataset.armed = "true";
-      if (Math.abs(delta) < 170 && decor.dataset.armed !== "false") {
-        decor.dataset.armed = "false";
-        decor.classList.remove("aniteez-bounce"); void decor.offsetWidth;
-        decor.classList.add("aniteez-bounce");
+    state.aniteezActivation.forEach((entry, id) => {
+      const delta = circularDelta(entry.x, localX);
+      const crossedAfterMovingForward = entry.lastDelta !== null && entry.lastDelta > -105 && delta <= -105 && state.velocity > .15;
+      const crossedAfterMovingBackward = entry.lastDelta !== null && entry.lastDelta < 105 && delta >= 105 && state.velocity < -.15;
+      if (Math.abs(delta) > 470) {
+        entry.armed = true;
+        aniteezGroups.get(id)?.forEach((decor) => decor.classList.remove("aniteez-bounce"));
       }
+      if (entry.armed && Math.abs(delta) < 260 && (crossedAfterMovingForward || crossedAfterMovingBackward)) {
+        entry.armed = false;
+        const visibleCopies = (aniteezGroups.get(id) || []).filter((decor) => decor.style.visibility !== "hidden");
+        visibleCopies.forEach((decor) => decor.classList.remove("aniteez-bounce"));
+        if (visibleCopies[0]) void visibleCopies[0].offsetWidth;
+        visibleCopies.forEach((decor) => decor.classList.add("aniteez-bounce"));
+      }
+      entry.lastDelta = delta;
     });
   }
 
@@ -740,8 +797,10 @@
     const inOcean = localX > OCEAN_START + 120 && localX < OCEAN_END + 60;
     pirateHatRig.classList.toggle("is-retracted", !inOcean);
     pirateShipRig.classList.toggle("is-retracted", !inOcean);
-    pirateHatRig.style.top = `${(y - 270 + Math.sin(now / 520) * 3).toFixed(1)}px`;
-    pirateShipRig.style.top = `${y.toFixed(1)}px`;
+    if (inOcean) {
+      pirateHatRig.style.top = `${(y - 270 + Math.sin(now / 520) * 3).toFixed(1)}px`;
+      pirateShipRig.style.top = `${y.toFixed(1)}px`;
+    }
   }
 
   function updateBus(now) {
@@ -759,14 +818,17 @@
     const opacity = cycle < .8 ? .88 * coverOpacity : 0;
     busElements.forEach((bus) => {
       const offset = Number(bus.dataset.copyOffset || 0);
-      bus.style.left = `${x + offset}px`;
-      bus.style.top = `${y}px`;
       bus.style.opacity = opacity.toFixed(3);
-      bus.style.transform = `translate(-50%,-100%) rotate(${angle.toFixed(2)}deg) scaleX(-1)`;
+      bus.style.transform = `translate3d(${(x + offset).toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,-100%) rotate(${angle.toFixed(2)}deg) scaleX(-1)`;
     });
   }
 
   function render(now) {
+    if (state.paused) {
+      state.lastTime = now;
+      requestAnimationFrame(render);
+      return;
+    }
     const dt = Math.min(32, now - state.lastTime);
     state.lastTime = now;
     if (!state.overlayOpen && !state.transitionActive) {
@@ -787,14 +849,18 @@
     state.wasInOcean = inOcean;
     const slopeAngle = Math.max(-6, Math.min(6, routeAngle(localX) * .47));
     const motionLean = Math.max(-2.5, Math.min(2.5, state.velocity * .07));
+    drawRoad(localX);
     world.style.transform = `translate3d(${(PLAYER_X - (localX + TRACK_W)).toFixed(2)}px,0,0)`;
     foregroundLayer.style.transform = world.style.transform;
-    characterRig.style.top = `${y.toFixed(2)}px`;
-    characterRig.style.transform = `rotate(${(slopeAngle + motionLean).toFixed(2)}deg)`;
-    drinkRig.style.top = `${(y - 82).toFixed(2)}px`;
-    if (!drinkRig.classList.contains("is-hidden")) drinkRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 430) * 1.2).toFixed(2)}deg)`;
-    tentacleRig.style.top = `${(y - 72).toFixed(2)}px`;
-    if (!tentacleRig.classList.contains("is-hidden")) tentacleRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 460) * 1.05).toFixed(2)}deg)`;
+    characterRig.style.transform = `translate3d(0,${y.toFixed(2)}px,0) rotate(${(slopeAngle + motionLean).toFixed(2)}deg)`;
+    if (!drinkRig.classList.contains("is-hidden")) {
+      drinkRig.style.top = `${(y - 82).toFixed(2)}px`;
+      drinkRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 430) * 1.2).toFixed(2)}deg)`;
+    }
+    if (!tentacleRig.classList.contains("is-hidden")) {
+      tentacleRig.style.top = `${(y - 72).toFixed(2)}px`;
+      tentacleRig.style.transform = `rotate(${(slopeAngle * .55 + Math.sin(now / 460) * 1.05).toFixed(2)}deg)`;
+    }
     updatePirateScene(localX, y, now);
     updateBus(now);
 
@@ -806,8 +872,10 @@
       sceneCamera.style.setProperty("--look-x", `${state.look.x.toFixed(2)}px`);
       sceneCamera.style.setProperty("--look-y", `${state.look.y.toFixed(2)}px`);
     }
+    const interactionElapsed = now - state.lastInteractionTime;
     if (!state.overlayOpen && !state.transitionActive &&
-        (Math.abs(localX - state.lastInteractionX) > 2 || now - state.lastInteractionTime > 90)) {
+        (Number.isNaN(state.lastInteractionX) || interactionElapsed > 180 ||
+         (interactionElapsed > 70 && Math.abs(localX - state.lastInteractionX) > 2))) {
       state.lastInteractionX = localX;
       state.lastInteractionTime = now;
       updateVisibleWorld(localX);
@@ -831,8 +899,10 @@
 
   function pointerMove(event) {
     const rect = stage.getBoundingClientRect();
-    state.look.targetX = ((event.clientX - rect.left) / rect.width - .5) * -86;
-    state.look.targetY = (.5 - (event.clientY - rect.top) / rect.height) * 118;
+    if (event.pointerType !== "touch") {
+      state.look.targetX = ((event.clientX - rect.left) / rect.width - .5) * -86;
+      state.look.targetY = (.5 - (event.clientY - rect.top) / rect.height) * 118;
+    }
     if (!state.pointerDown || state.overlayOpen || state.transitionActive) return;
     const delta = event.clientX - state.lastPointerX;
     if (Math.abs(delta) > 2) state.pointerDragged = true;
@@ -876,6 +946,7 @@
   }
   function endTransition() {
     if (!state.transitionActive || transition.classList.contains("is-leaving")) return;
+    window.clearTimeout(transitionFallbackTimer);
     transition.classList.add("is-leaving");
     window.setTimeout(() => {
       state.transitionActive = false;
@@ -883,6 +954,17 @@
       transition.setAttribute("aria-hidden", "true");
       transitionVideo.pause();
     }, 1160);
+  }
+
+  function restartTransition() {
+    window.clearTimeout(transitionFallbackTimer);
+    state.transitionActive = true;
+    transition.classList.remove("is-leaving");
+    transition.classList.add("is-active");
+    transition.setAttribute("aria-hidden", "false");
+    transitionVideo.currentTime = 0;
+    transitionVideo.play().catch(() => {});
+    transitionFallbackTimer = window.setTimeout(endTransition, 9400);
   }
 
   function bindEvents() {
@@ -909,15 +991,17 @@
     transitionVideo.addEventListener("ended", endTransition);
     transitionVideo.addEventListener("error", () => window.setTimeout(endTransition, 1600));
     $("#skipTransition").addEventListener("click", endTransition);
-    window.setTimeout(endTransition, 9400);
+    transitionFallbackTimer = window.setTimeout(endTransition, 9400);
   }
 
   window.orbitStreetScene = {
     setLanguage(next) { language = next; syncCopy(); },
     setSound(enabled) { state.soundOn = enabled; $("#soundButton").classList.toggle("is-off", !enabled); },
+    setPreloaded(paused) { state.paused = Boolean(paused); if (state.paused) transitionVideo.pause(); },
+    activate(outfit) { if (outfit) setOutfit(outfit); state.paused = false; state.lastTime = performance.now(); restartTransition(); },
+    clearHandoff() { stage.classList.remove("is-handing-off"); },
     snapshot: () => ({ outfit: state.outfit, selectedDrink: state.selectedDrink, lap: state.lap }),
   };
-  buildRoad();
   buildProps();
   cacheSceneElements();
   setOutfit(state.outfit);

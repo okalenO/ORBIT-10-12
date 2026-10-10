@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>ORBIT 10:12 · Beach Graybox</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="viewport" class="viewport">
+      <section id="stage" class="stage" aria-label="海边拍照场景">
+        <div id="beachScene" class="beach-scene">
+          <img id="beachBackground" class="beach-background" src="./assets/beach-background.jpg" alt="海边" draggable="false" />
+          <div id="birdLayer" class="bird-layer" aria-hidden="true"></div>
+
+          <div id="introCharacter" class="intro-character" aria-label="钟浩">
+            <img id="introCharacterArt" alt="" draggable="false" />
+          </div>
+          <img id="photoCharacter" class="photo-character" alt="拍照中的钟浩" draggable="false" />
+
+          <div id="characterDialogue" class="character-dialogue" role="status"></div>
+
+          <div id="cameraUi" class="camera-ui" aria-hidden="true">
+            <div id="shadeTop" class="camera-shade shade-top"></div>
+            <div id="shadeBottom" class="camera-shade shade-bottom"></div>
+            <div id="shadeLeft" class="camera-shade shade-left"></div>
+            <div id="shadeRight" class="camera-shade shade-right"></div>
+            <img id="viewfinderTexture" class="viewfinder-texture" src="./assets/viewfinder-mask.png" alt="" draggable="false" />
+            <p id="cameraHint" class="camera-hint" data-i18n="desktopHint">移动鼠标控制相机，单击拍摄</p>
+          </div>
+
+          <section id="reviewPanel" class="review-panel" aria-hidden="true">
+            <div class="flat-preview">
+              <div id="reviewPhoto" class="preview-photo snapshot-photo" aria-label="刚刚拍摄的照片">
+                <img class="snapshot-background" alt="" draggable="false" />
+                <img class="snapshot-character" alt="" draggable="false" />
+              </div>
+              <img id="reviewFrame" class="preview-frame" src="./assets/polaroid-frame-01.png" alt="拍立得边框" draggable="false" />
+            </div>
+            <div class="review-tools">
+              <p data-i18n="chooseFrame">选择拍立得边框</p>
+              <div class="frame-options" role="group" aria-label="拍立得边框">
+                <button class="frame-option is-selected" type="button" data-frame="1">01</button>
+                <button class="frame-option" type="button" data-frame="2">02</button>
+                <button class="frame-option" type="button" data-frame="3">03</button>
+              </div>
+              <div class="review-actions">
+                <button id="retakeButton" class="paper-button secondary" type="button" data-i18n="retake">重新拍摄</button>
+                <button id="finishButton" class="paper-button primary" type="button" data-i18n="finish">完成</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="finalPanel" class="final-panel" aria-hidden="true">
+            <div class="mockup-floor" aria-hidden="true"></div>
+            <div id="polaroidMockup" class="polaroid-mockup">
+              <div class="polaroid-thickness" aria-hidden="true"></div>
+              <div class="polaroid-face">
+                <div id="finalPhoto" class="preview-photo snapshot-photo" aria-label="完成的拍立得">
+                  <img class="snapshot-background" alt="" draggable="false" />
+                  <img class="snapshot-character" alt="" draggable="false" />
+                </div>
+                <img id="finalFrame" class="preview-frame" src="./assets/polaroid-frame-01.png" alt="" draggable="false" />
+              </div>
+            </div>
+            <div class="final-actions">
+              <button id="putAwayButton" class="paper-button primary" type="button" data-i18n="putAway">收起来</button>
+              <button id="anotherPhotoButton" class="paper-button secondary" type="button" data-i18n="anotherPhoto">再拍一张</button>
+              <button id="saveButton" class="save-button" type="button" aria-label="保存到本地" title="保存到本地">
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 7h20l6 6v28H10V7h2Zm5 0v12h15V7M17 31h14M24 25v14" /></svg>
+              </button>
+            </div>
+          </section>
+
+          <div class="hud">
+            <span class="hud-time">15:00</span>
+            <button id="soundButton" class="hud-button" type="button" aria-label="切换海浪声" aria-pressed="true">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20h9l10-8v24l-10-8H8z"/><path class="sound-wave" d="M33 17c3 4 3 10 0 14M38 12c6 7 6 17 0 24"/></svg>
+            </button>
+            <button id="backButton" class="hud-button" type="button" aria-label="返回上一界面">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 10 8 24l13 14"/><path d="M10 24h19c8 0 11 5 11 12"/></svg>
+            </button>
+          </div>
+          <div class="bottom-action-wrap">
+            <button id="mainAction" class="paper-button main-action is-hidden" type="button" data-i18n="takePhotos">来拍照吧</button>
+          </div>
+        </div>
+
+        <section id="transition" class="transition is-active" aria-label="场景转场">
+          <div class="transition-paper" aria-hidden="true"></div>
+          <div class="transition-copy">
+            <p class="transition-time">15:00</p>
+            <p class="transition-place" data-i18n="place">海边</p>
+          </div>
+        </section>
+
+        <div class="rotate-note">横屏观看效果更完整<br /><small>请旋转手机</small></div>
+      </section>
+    </main>
+
+    <audio id="oceanAudio" src="./assets/ocean-loop.mp3" preload="auto" loop playsinline></audio>
+    <audio id="ejectAudio" src="./assets/polaroid-eject.mp3" preload="auto"></audio>
+    <audio id="chimeAudio" src="../street/assets/audio/wind-chime.mp3" preload="auto"></audio>
+    <canvas id="captureCanvas" width="940" height="1100" hidden></canvas>
+    <canvas id="saveCanvas" width="1505" height="2000" hidden></canvas>
+    <script src="./inline-assets.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

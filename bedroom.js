@@ -331,6 +331,7 @@ function applyBedroomOutfit(outfit) {
   bedroomOutfitCharacter.style.setProperty("--sprite-h", `${height}%`);
   bedroomOutfitCharacter.setAttribute("aria-hidden", "false");
   bedroomScene.classList.add("has-dressed-character");
+  window.orbitStreet?.prepare?.();
 }
 
 function updateWardrobeHotspots() {

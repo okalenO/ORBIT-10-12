@@ -1,11 +1,30 @@
 (() => {
   const scene = document.querySelector('.restaurant-game-scene');
   const frame = scene.querySelector('iframe');
+  const beachChime = new Audio('street/assets/audio/wind-chime.mp3');
+  beachChime.preload = 'auto';
 
   function exitRestaurant() {
     frame.removeAttribute('src');
+    scene.classList.remove('is-active', 'is-preparing');
+    scene.setAttribute('aria-hidden', 'true');
+  }
+
+  function hideRestaurant() {
     scene.classList.remove('is-active');
     scene.setAttribute('aria-hidden', 'true');
+  }
+
+  function resumeRestaurant() {
+    window.orbitGameState.currentScene = 'restaurant';
+    frame.contentWindow?.orbitRestaurantScene?.resumeFromBeach?.();
+    scene.setAttribute('aria-hidden', 'false');
+    scene.classList.add('is-preparing');
+    void scene.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      scene.classList.add('is-active');
+      scene.classList.remove('is-preparing');
+    }));
   }
 
   window.orbitRestaurant = {
@@ -18,21 +37,32 @@
       scene.setAttribute('aria-hidden', 'false');
       scene.classList.add('is-preparing');
       frame.addEventListener('load', () => {
-        requestAnimationFrame(() => {
-          scene.classList.remove('is-preparing');
+        void scene.offsetWidth;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
           scene.classList.add('is-active');
-          window.orbitStreet?.hideForRestaurant();
-        });
+          scene.classList.remove('is-preparing');
+          window.orbitStreet?.clearHandoff?.();
+          window.setTimeout(() => window.orbitStreet?.hideForRestaurant(), 900);
+        }));
       }, { once: true });
       frame.src = 'restaurant/index.html';
     },
     returnToStreet: () => {
       window.orbitStreet.resume();
-      requestAnimationFrame(() => {
+      window.setTimeout(() => {
         scene.classList.remove('is-active');
         window.setTimeout(exitRestaurant, 560);
-      });
+      }, 600);
     },
+    hideForBeach: hideRestaurant,
+    resume: resumeRestaurant,
+    playBeachChime: () => {
+      if (!window.orbitMenu.getBgmEnabled()) return;
+      beachChime.currentTime = 0;
+      beachChime.volume = .78;
+      beachChime.play().catch(() => {});
+    },
+    goToBeach: () => window.orbitBeach?.enter(),
     setLanguage: language => window.orbitMenu.setLanguage(language),
     toggleSound: () => window.orbitMenu.toggleBgm(),
     updateResult: result => { window.orbitGameState.restaurantResult = result; },
@@ -44,4 +74,5 @@
   window.addEventListener('orbit-bgm-change', event => {
     frame.contentWindow?.orbitRestaurantScene?.setSound(event.detail.enabled);
   });
+  window.resetRestaurantScene = exitRestaurant;
 })();

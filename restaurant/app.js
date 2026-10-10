@@ -27,7 +27,6 @@
   const waiterCake = $("#waiterCake");
   const waiterCakeDecorations = $("#waiterCakeDecorations");
   const mainAction = $("#mainAction");
-  const languageButton = $("#languageButton");
   const soundButton = $("#soundButton");
   const backButton = $("#backButton");
   const menuOverlay = $("#menuOverlay");
@@ -42,7 +41,6 @@
   const transition = $("#transition");
   const nextScene = $("#nextScene");
 
-  const languageOrder = ["zh", "ko", "en"];
   const copy = {
     zh: {
       language: "中文",
@@ -73,6 +71,7 @@
       surprise: "等下再给钟浩一个惊喜吧",
       finalLine: "那我们走吧？",
       go: "走吧",
+      beachTransitionPlace: "海边",
       nextPlaceholder: "下一幕待接入",
       soundOn: "关闭背景音乐",
       soundOff: "开启背景音乐",
@@ -107,6 +106,7 @@
       surprise: "이따 종호에게 깜짝 선물로 줘요",
       finalLine: "그럼 이제 갈까?",
       go: "가자",
+      beachTransitionPlace: "바닷가",
       nextPlaceholder: "다음 장면 연결 예정",
       soundOn: "배경 음악 끄기",
       soundOff: "배경 음악 켜기",
@@ -141,6 +141,7 @@
       surprise: "Let's surprise Jongho with it later.",
       finalLine: "Shall we go?",
       go: "LET'S GO",
+      beachTransitionPlace: "THE BEACH",
       nextPlaceholder: "NEXT SCENE TO BE CONNECTED",
       soundOn: "TURN BGM OFF",
       soundOff: "TURN BGM ON",
@@ -248,7 +249,6 @@
 
   function applyLanguage() {
     document.documentElement.lang = state.language === "zh" ? "zh-CN" : state.language;
-    languageButton.textContent = t("language");
     $$('[data-i18n]').forEach((element) => {
       const key = element.dataset.i18n;
       element.textContent = t(key);
@@ -485,8 +485,20 @@
     state.phase = "done";
     hideLiveText(characterDialogue);
     setAction(null, null);
+    bridge?.playBeachChime?.();
+    nextScene.classList.toggle("is-handoff", Boolean(bridge?.goToBeach));
     nextScene.classList.add("is-active");
     nextScene.setAttribute("aria-hidden", "false");
+    if (bridge?.goToBeach) bridge.goToBeach();
+  }
+
+  function resumeFromBeach() {
+    nextScene.classList.remove("is-active", "is-handoff");
+    nextScene.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("is-returning");
+    state.phase = "finale";
+    setLiveText(characterDialogue, "finalLine");
+    setAction("go", goToNextScene);
   }
 
   function stagePoint(event) {
@@ -606,12 +618,6 @@
   saveCardButton.addEventListener("click", saveCard);
   soundButton.addEventListener("click", toggleSound);
   backButton.addEventListener("click", goBack);
-  languageButton.addEventListener("click", () => {
-    const next = (languageOrder.indexOf(state.language) + 1) % languageOrder.length;
-    state.language = languageOrder[next];
-    applyLanguage();
-    bridge?.setLanguage?.(next);
-  });
   window.addEventListener("resize", resizeStage);
 
   window.orbitRestaurantScene = {
@@ -624,6 +630,7 @@
       state.soundOn = Boolean(enabled);
       updateSoundButton();
     },
+    resumeFromBeach,
   };
 
   initializeCakePieces();
