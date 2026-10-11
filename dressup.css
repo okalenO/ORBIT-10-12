@@ -496,6 +496,12 @@ html[lang="ko"] .dressup-confirm-button {
   color: var(--leaf-dark);
 }
 
+.dressup-bgm-credit {
+  top: 3.6%;
+  right: 3.1%;
+  opacity: 0.82;
+}
+
 .dressup-bgm-toggle .speaker-body {
   fill: currentColor;
 }

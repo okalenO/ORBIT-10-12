@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f6efe0" />
     <title>ORBIT 10:12 — Menu Graybox</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="bedroom.css" />
-    <link rel="stylesheet" href="dressup.css" />
+    <link rel="stylesheet" href="styles.css?v=20261012-3" />
+    <link rel="stylesheet" href="bedroom.css?v=20261012-2" />
+    <link rel="stylesheet" href="dressup.css?v=20261012-1" />
   </head>
   <body>
     <main class="viewport">
@@ -60,6 +60,7 @@
           </div>
 
           <div class="room-canvas">
+            <p class="scene-bgm-credit bedroom-bgm-credit">BGM · ろっかばいまいべいびい</p>
             <img class="room-media room-dark-bg" src="assets/bedroom/bedroom-dark.png" alt="" draggable="false" />
             <div class="dark-sleeping-breath" aria-hidden="true"></div>
 
@@ -109,7 +110,7 @@
               <p></p>
             </div>
 
-            <div class="bedroom-character-hint" aria-hidden="true"><span><img src="assets/bedroom/hand-palm-down.svg" alt="" draggable="false" /></span></div>
+            <div class="bedroom-character-hint" aria-hidden="true"><span><img src="assets/bedroom/hand-palm-down.png" alt="" draggable="false" /></span></div>
             <button class="bedroom-depart-button" type="button" aria-hidden="true" disabled>出发</button>
 
             <p class="bedroom-time" aria-label="Time">10:12</p>
@@ -148,6 +149,7 @@
 
         <section class="dressup-scene" aria-hidden="true">
           <div class="dressup-canvas">
+            <p class="scene-bgm-credit dressup-bgm-credit">BGM · ろっかばいまいべいびい</p>
             <img class="dressup-background" src="assets/dressup/dressup-background.png" alt="" draggable="false" />
 
             <div class="garment-rail" aria-label="Choose an outfit">
@@ -229,6 +231,8 @@
         <section class="street-scene" aria-hidden="true"><iframe title="Street" allow="autoplay"></iframe></section>
         <section class="restaurant-game-scene" aria-hidden="true"><iframe title="Restaurant" allow="autoplay"></iframe></section>
         <section class="beach-game-scene" aria-hidden="true"><iframe title="Beach" allow="autoplay"></iframe></section>
+        <section class="finale-game-scene" aria-hidden="true"><iframe title="Finale" allow="autoplay"></iframe></section>
+        <section class="epilogue-game-scene" aria-hidden="true"><iframe title="Epilogue"></iframe></section>
         <div class="scene-return-mask" aria-hidden="true"></div>
       </section>
 
@@ -240,11 +244,13 @@
     </main>
 
     <script src="game-state.js"></script>
-    <script src="script.js"></script>
-    <script src="bedroom.js"></script>
+    <script src="script.js?v=20261012-2"></script>
+    <script src="bedroom.js?v=20261011-2"></script>
     <script src="dressup.js"></script>
-    <script src="street.js"></script>
-    <script src="restaurant.js"></script>
-    <script src="beach.js"></script>
+    <script src="street.js?v=20261012-1"></script>
+    <script src="restaurant.js?v=20261012-1"></script>
+    <script src="beach.js?v=20261012-1"></script>
+    <script src="finale.js?v=20261012-2"></script>
+    <script src="epilogue.js?v=20261012-2"></script>
   </body>
 </html>

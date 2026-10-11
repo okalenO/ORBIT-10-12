@@ -3,42 +3,55 @@
   const frame = scene.querySelector('iframe');
   let frameReady = false;
   let preloading = false;
+  let preparePromise = null;
 
   function exitStreet() {
     frame.removeAttribute('src');
     frameReady = false;
     preloading = false;
+    preparePromise = null;
     scene.classList.remove('is-active', 'is-preparing');
     scene.setAttribute('aria-hidden', 'true');
   }
 
   function prepareStreet() {
-    if (frame.getAttribute('src')) return;
+    if (frameReady) return Promise.resolve();
+    if (preparePromise) return preparePromise;
     preloading = true;
-    frame.addEventListener('load', () => {
-      frameReady = true;
-      frame.contentWindow?.orbitStreetScene?.setPreloaded?.(true);
-    }, { once: true });
-    frame.src = 'street/index.html';
+    preparePromise = new Promise(resolve => {
+      frame.addEventListener('load', async () => {
+        const controller = frame.contentWindow?.orbitStreetScene;
+        controller?.setPreloaded?.(true);
+        await controller?.prepareTransition?.();
+        frameReady = true;
+        resolve();
+      }, { once: true });
+      frame.src = 'street/index.html';
+    });
+    return preparePromise;
   }
 
-  function showStreet() {
+  async function showStreet() {
+    await prepareStreet();
     preloading = false;
-    frame.contentWindow?.orbitStreetScene?.activate?.(window.orbitGameState.confirmedOutfit);
     scene.setAttribute('aria-hidden', 'false');
     scene.classList.add('is-preparing');
     void scene.offsetWidth;
+    await frame.contentWindow?.orbitStreetScene?.activate?.(window.orbitGameState.confirmedOutfit);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       scene.classList.add('is-active');
       scene.classList.remove('is-preparing');
     }));
   }
   function hideStreet() {
+    frame.contentWindow?.orbitStreetScene?.setPaused?.(true);
     scene.classList.remove('is-active');
     scene.setAttribute('aria-hidden', 'true');
   }
   function resumeStreet() {
     window.orbitGameState.currentScene = 'street';
+    window.orbitBgm?.enter?.('street');
+    frame.contentWindow?.orbitStreetScene?.resumeFromRestaurant?.();
     scene.setAttribute('aria-hidden', 'false');
     scene.classList.add('is-preparing');
     void scene.offsetWidth;
@@ -55,11 +68,22 @@
       exitStreet();
       window.returnToBedroomFromDressup();
     },
-    setDrink: drink => { window.orbitGameState.selectedDrink = drink; },
+    setDrink: drink => {
+      window.orbitGameState.selectedDrink = drink;
+      if (drink) {
+        window.orbitGameState.drinkChoice = drink;
+        try { localStorage.setItem('orbit:drinkChoice', drink); } catch (_error) {}
+      }
+    },
     enterRestaurant: () => {
       window.orbitRestaurant?.enter();
     },
+    onSceneReady: () => {
+      window.orbitBgm?.enter?.('street');
+      window.orbitBgm?.preload?.('restaurant');
+    },
     hideForRestaurant: hideStreet,
+    pause: () => frame.contentWindow?.orbitStreetScene?.setPaused?.(true),
     clearHandoff: () => frame.contentWindow?.orbitStreetScene?.clearHandoff?.(),
     resume: resumeStreet,
   };
@@ -72,10 +96,6 @@
     window.orbitGameState.currentScene = 'street';
     window.orbitGameState.selectedDrink = null;
     preloading = false;
-    if (frameReady) showStreet();
-    else {
-      prepareStreet();
-      frame.addEventListener('load', showStreet, { once: true });
-    }
+    showStreet();
   });
 })();

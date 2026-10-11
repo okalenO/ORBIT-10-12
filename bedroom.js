@@ -111,8 +111,32 @@ let awakeMotionTimer;
 let awakeMotionToken = 0;
 let characterHintTimer;
 let lunchInviteTriggered = false;
+let bedroomFxContext;
 const characterHint = document.querySelector(".bedroom-character-hint");
 const departButton = document.querySelector(".bedroom-depart-button");
+
+function playBedroomInteractionSound(action) {
+  if (!(window.orbitMenu?.getBgmEnabled?.() ?? true)) return;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  try {
+    bedroomFxContext ||= new AudioContextClass();
+    const context = bedroomFxContext;
+    context.resume().catch(() => {});
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const baseFrequency = action === "character" ? 520 : action === "curtain" ? 330 : 410;
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(baseFrequency, context.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(baseFrequency * 1.18, context.currentTime + .08);
+    gain.gain.setValueAtTime(.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.032, context.currentTime + .012);
+    gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + .16);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + .17);
+  } catch (_error) {}
+}
 function hideDeparturePrompt() {
   window.clearTimeout(characterHintTimer);
   characterHint.classList.remove("is-visible");
@@ -290,6 +314,10 @@ function handleCharacterClick() {
 
   if (window.orbitGameState.bedroomState === "awake") {
     if (bedroomScene.classList.contains("has-dressed-character")) {
+      bedroomOutfitCharacter.classList.remove("is-patting");
+      void bedroomOutfitCharacter.offsetWidth;
+      bedroomOutfitCharacter.classList.add("is-patting");
+      window.setTimeout(() => bedroomOutfitCharacter.classList.remove("is-patting"), 720);
       showDialogue("lunchInvite", 6500);
       lunchInviteTriggered = true;
       hideDeparturePrompt();
@@ -332,6 +360,7 @@ function applyBedroomOutfit(outfit) {
   bedroomOutfitCharacter.setAttribute("aria-hidden", "false");
   bedroomScene.classList.add("has-dressed-character");
   window.orbitStreet?.prepare?.();
+  window.orbitBgm?.preload?.("street");
 }
 
 function updateWardrobeHotspots() {
@@ -381,6 +410,7 @@ function returnToBedroom() {
   clearSceneTimers();
   window.exitDressupScene?.();
   window.orbitGameState.currentScene = "bedroom";
+  window.orbitBgm?.enter?.("bedroom");
   bedroomScene.setAttribute("aria-hidden", "false");
   setBedroomState("returning");
 
@@ -402,6 +432,7 @@ function handleRoomAction(event) {
   if (!hotspot) return;
 
   const action = hotspot.dataset.action;
+  playBedroomInteractionSound(action);
   if (action === "curtain") openCurtains();
   if (action === "character") handleCharacterClick();
   if (action === "phone") openPhone();
@@ -418,6 +449,7 @@ function handleRoomAction(event) {
 function enterBedroomScene() {
   resetBedroomScene();
   window.orbitGameState.currentScene = "bedroom";
+  window.orbitBgm?.enter?.("bedroom");
   setBedroomState("entering");
   bedroomScene.setAttribute("aria-hidden", "false");
   bedroomScene.classList.add("is-entering");

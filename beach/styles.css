@@ -17,6 +17,8 @@ body { font-family: "WaWa", "Bradley Hand ITC", "Microsoft YaHei UI", cursive; u
 html[lang="ko"] body { font-family: "SoodaGongju", "Malgun Gothic", cursive; }
 body::after { content: ""; position: fixed; inset: 0; z-index: 9999; background: #050505; opacity: 0; pointer-events: none; transition: opacity .65s ease; }
 body.is-returning::after, body.is-next-scene::after { opacity: 1; }
+body.is-next-scene::after { transition-duration: 1.1s; }
+html.is-scene-paused *, html.is-scene-paused *::before, html.is-scene-paused *::after { animation-play-state: paused !important; }
 button { font: inherit; }
 .viewport { position: fixed; inset: 0; overflow: hidden; background: #090b0d; }
 .stage {

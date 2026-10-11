@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>ORBIT 10:12 · Finale</title>
+  <link rel="stylesheet" href="./styles.css?v=20261012-2" />
+</head>
+<body>
+  <main class="viewport">
+    <section id="stage" class="stage" aria-label="主线终幕灰盒">
+      <section id="beachScene" class="scene beach-scene" aria-label="傍晚海边">
+        <img class="full-background" src="./assets/beach2-background.png" alt="傍晚海边" draggable="false" />
+        <img class="whale-layer" src="./assets/beach2-whale.png" alt="" draggable="false" />
+        <div id="birdLayer" class="bird-layer" aria-hidden="true"></div>
+
+        <button class="hotspot shell" data-hotspot="shell" type="button" aria-label="海螺">
+          <img src="./assets/beach2-shell.png" alt="" draggable="false" />
+        </button>
+        <button class="hotspot crab" data-hotspot="crab" type="button" aria-label="小螃蟹">
+          <img src="./assets/beach2-crab.png" alt="" draggable="false" />
+        </button>
+        <button class="hotspot starfish" data-hotspot="starfish" type="button" aria-label="海星">
+          <img src="./assets/beach2-starfish.png" alt="" draggable="false" />
+        </button>
+        <button class="hotspot bottle" data-hotspot="bottle" type="button" aria-label="漂流瓶">
+          <img src="./assets/beach2-bottle.png" alt="" draggable="false" />
+        </button>
+
+        <button id="beachCharacterButton" class="character-button seated-character is-idle" type="button" aria-label="钟浩" disabled>
+          <img id="seatedCharacter" src="./assets/beach2-plaid-1.png" alt="钟浩" draggable="false" />
+        </button>
+        <div id="singingNotes" class="singing-notes" aria-hidden="true"></div>
+        <img id="standingCharacter" class="standing-character" src="./assets/standing-plaid.png" alt="站起来的钟浩" draggable="false" />
+        <span id="beachPatHint" class="pat-hint beach-pat" aria-hidden="true"><img src="../assets/bedroom/hand-palm-down.png" alt="" draggable="false" /></span>
+        <video id="thinkingVideo" class="thinking-video" src="./assets/thinking.mp4" playsinline preload="auto"></video>
+
+        <div id="speech" class="speech character-speech" role="status" aria-live="polite"></div>
+        <div id="playerSpeech" class="speech player-speech" role="status"></div>
+        <button id="continueButton" class="continue-hit" type="button" aria-label="继续对白">继续</button>
+      </section>
+
+      <section id="homeTransition" class="home-transition" aria-label="回家转场">
+        <div class="transition-copy">
+          <p class="transition-time">23:30</p>
+          <p id="transitionPlace" class="transition-place">卧室</p>
+        </div>
+        <button id="skipTransition" class="skip-button" type="button">SKIP</button>
+      </section>
+
+      <section id="bedroomScene" class="scene bedroom-scene" aria-label="夜晚卧室">
+        <img class="full-background" src="./assets/bedroom-night-background.png" alt="夜晚卧室" draggable="false" />
+        <p class="scene-bgm-credit">BGM · Just Like the First Time</p>
+
+        <div id="bedroomKeepsakes" class="bedroom-keepsakes">
+          <button id="cakeKeepsake" class="keepsake cake-keepsake" type="button" aria-label="今天制作的蛋糕">
+            <img class="cake-base-art" src="../restaurant/assets/restaurant-cake.png" alt="" draggable="false" />
+            <img id="cakeCream" class="cake-cream-art" src="../restaurant/assets/restaurant-cream-border.png" alt="" draggable="false" />
+            <span id="cakeDecorations" class="cake-decorations"></span>
+          </button>
+          <button id="cardKeepsake" class="keepsake card-keepsake" type="button" aria-label="今天写的贺卡"><img src="./assets/restaurant-card-cropped.png" alt="" draggable="false" /><span id="cardPreview">HAPPY BIRTHDAY</span></button>
+          <button id="photoKeepsake" class="keepsake photo-keepsake" type="button" aria-label="今天拍下的拍立得"><img id="photoPreview" alt="今天拍下的拍立得" /><img id="photoFramePreview" class="photo-frame-preview" alt="" /></button>
+          <button id="drinkKeepsake" class="keepsake drink-keepsake" type="button" aria-label="今天买的饮品"><img id="drinkPreview" alt="今天买的饮品" /></button>
+        </div>
+
+        <div id="bedroomCharacter" class="bedroom-character">
+          <img id="bedroomCharacterImage" src="./assets/standing-plaid.png" alt="钟浩" draggable="false" />
+        </div>
+        <span id="bedroomPatHint" class="pat-hint bedroom-pat" aria-hidden="true"><img src="../assets/bedroom/hand-palm-down.png" alt="" draggable="false" /></span>
+        <div id="bedroomSpeech" class="speech bedroom-speech" role="status" aria-live="polite"></div>
+
+        <section id="cgLayer" class="cg-layer" aria-label="终幕 CG">
+          <div class="cg-placeholder cg-one"><video id="cgOneVideo" src="./assets/cg-1.mp4" muted playsinline preload="auto"></video></div>
+          <div class="cg-placeholder cg-two"><img src="./assets/cg-2.jpg" alt="" onerror="this.remove()" /></div>
+        </section>
+        <video id="finaleVideo" class="finale-video" src="./assets/finale.mp4" playsinline preload="metadata" muted></video>
+        <div id="videoFallback" class="video-fallback"><span>FINALE MP4</span><small>素材待替换</small></div>
+
+        <section id="birthdayMoment" class="birthday-moment">
+          <h1>HAPPY BIRTHDAY JONGHO</h1>
+          <p class="love-line">사랑해!</p>
+          <button id="happinessButton" class="ending-response" type="button">행복하자!</button>
+        </section>
+
+        <button id="bedroomContinueButton" class="continue-hit" type="button" aria-label="继续对白">继续</button>
+      </section>
+
+      <section id="finalBlack" class="final-black">
+        <div class="final-message">
+          <p id="thankYouLine">谢谢你一直在我身边</p>
+          <p>See you again next year.</p>
+          <small id="epilogueHint">点击空白处进入尾声</small>
+        </div>
+      </section>
+
+      <section id="epilogue" class="epilogue" aria-label="独立尾声">
+        <div class="epilogue-menu">
+          <p class="epilogue-kicker">ORBIT 10:12</p>
+          <h2>EPILOGUE</h2>
+          <button id="memoryEntry" class="epilogue-entry primary" type="button">TAKE THIS WITH YOU</button>
+          <button id="letterEntry" class="epilogue-entry" type="button">A LETTER FROM THE CREATOR</button>
+        </div>
+        <section id="memoryPanel" class="epilogue-panel memory-panel">
+          <button class="panel-back" type="button">BACK</button>
+          <div class="memory-card">
+            <p>ORBIT 10:12</p>
+            <img id="memoryPhoto" alt="今天的照片" />
+            <strong>See you again next year.</strong>
+          </div>
+          <button id="saveMemory" class="download-button" type="button">SAVE</button>
+        </section>
+        <section id="letterPanel" class="epilogue-panel letter-panel">
+          <button class="panel-back" type="button">BACK</button>
+          <article>
+            <p class="letter-label">A LETTER FROM THE CREATOR</p>
+            <p id="letterPlaceholder">制作者来信正文将在最终版本补充。</p>
+            <p class="signature">From,<br />[ CREATOR NAME ]</p>
+          </article>
+        </section>
+        <p class="ai-credit">AI-assisted development · OpenAI Codex</p>
+      </section>
+
+      <nav id="hud" class="hud" aria-label="场景控制">
+        <span id="hudTime" class="hud-time">17:30</span>
+        <button id="soundButton" class="hud-button" type="button" aria-label="关闭声音" aria-pressed="true">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20h9l10-8v24l-10-8H8z"/><path class="sound-wave" d="M33 17c3 4 3 10 0 14M38 12c6 7 6 17 0 24"/></svg>
+        </button>
+        <button id="backButton" class="hud-button" type="button" aria-label="返回上一界面">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 10 8 24l13 14"/><path d="M10 24h19c8 0 11 5 11 12"/></svg>
+        </button>
+      </nav>
+
+      <div id="openingBlack" class="opening-black"></div>
+      <div class="rotate-note">横屏观看效果更完整<br /><small>请旋转手机</small></div>
+    </section>
+  </main>
+
+  <audio id="oceanAudio" src="./assets/ocean-loop.mp3" preload="auto" loop></audio>
+  <audio id="singingAudio" src="./assets/singing.mp3" preload="auto"></audio>
+  <audio id="homeTransitionAudio" src="./assets/home.mp3" preload="auto"></audio>
+  <audio id="homeAudio" src="../assets/audio/bgm/just-like-the-first-time.mp3" preload="auto" loop></audio>
+  <audio id="musicBoxAudio" src="./assets/happy-birthday-musicbox.mp3" preload="auto"></audio>
+  <audio id="finaleAudio" src="./assets/finale-audio.mp3" preload="auto"></audio>
+  <canvas id="memoryCanvas" width="1200" height="1600" hidden></canvas>
+  <script src="./app.js?v=20261012-2"></script>
+</body>
+</html>

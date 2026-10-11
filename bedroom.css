@@ -6,7 +6,8 @@
   background: #f8efdb;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 460ms ease;
+  transition: opacity 900ms ease;
+  will-change: opacity;
 }
 
 .stage.is-bedroom .bedroom-scene {
@@ -347,6 +348,15 @@
 .bedroom-scene.has-dressed-character .bedroom-outfit-character {
   opacity: 1;
   animation: bedroom-outfit-idle 4.4s ease-in-out infinite;
+}
+.bedroom-scene.has-dressed-character .bedroom-outfit-character.is-patting {
+  animation: bedroom-character-pat 680ms cubic-bezier(.2, 1.35, .35, 1);
+}
+@keyframes bedroom-character-pat {
+  0%, 100% { transform: scale(1); }
+  24% { transform: scaleX(1.09) scaleY(.86); }
+  54% { transform: scaleX(.95) scaleY(1.08) translateY(-1.4%); }
+  76% { transform: scaleX(1.025) scaleY(.98); }
 }
 
 .bedroom-scene.has-dressed-character.is-awake .character-sit-up,
@@ -733,6 +743,25 @@ html[lang="ko"] .character-bubble p {
   transition: opacity 720ms ease;
 }
 
+.scene-bgm-credit {
+  position: absolute;
+  z-index: 16;
+  top: 3.6%;
+  right: 3.1%;
+  margin: 0;
+  color: rgba(79, 116, 29, 0.78);
+  font: 700 clamp(10px, 0.82vw, 16px)/1.25 Georgia, serif;
+  letter-spacing: 0.035em;
+  text-align: right;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 720ms ease;
+}
+
+.bedroom-scene.is-room-ready .bedroom-bgm-credit {
+  opacity: 1;
+}
+
 .bedroom-scene.is-room-ready .bedroom-controls {
   opacity: 1;
   pointer-events: auto;
@@ -1106,7 +1135,7 @@ html[lang="ko"] .bedroom-depart-button {
   transition: transform 920ms cubic-bezier(0.42, 0.02, 0.24, 1), opacity 2800ms ease;
 }
 
-.bedroom-character-hint img { display: block; width: 1em; height: 1em; }
+.bedroom-character-hint img { display: block; width: 1em; height: 1em; object-fit:contain; filter:drop-shadow(2px 0 #fff) drop-shadow(-2px 0 #fff) drop-shadow(0 2px #fff) drop-shadow(0 -2px #fff) drop-shadow(0 7px 7px rgb(0 0 0 / 24%)); }
 
 /* Keep an opaque dark door beneath the light door during the room fade. */
 .wardrobe-closed-layer { opacity: 1; }

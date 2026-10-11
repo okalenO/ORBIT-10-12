@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>ORBIT 10:12 · Epilogue Graybox</title>
+  <link rel="stylesheet" href="./styles.css?v=20261012-1" />
+</head>
+<body>
+  <main class="viewport">
+    <section id="stage" class="stage" aria-label="ORBIT 10:12 独立尾声">
+      <div class="paper-grid" aria-hidden="true"></div>
+      <div class="epilogue-doodles" aria-hidden="true">
+        <img class="doodle doodle-01" src="./assets/epilogue-doodle-01.png" alt="" />
+        <img class="doodle doodle-02" src="./assets/epilogue-doodle-02.png" alt="" />
+        <img class="doodle doodle-03" src="./assets/epilogue-doodle-03.png" alt="" />
+        <img class="doodle doodle-04" src="./assets/epilogue-doodle-04.png" alt="" />
+        <img class="doodle doodle-05" src="./assets/epilogue-doodle-05.png" alt="" />
+        <img class="doodle doodle-06" src="./assets/epilogue-doodle-06.png" alt="" />
+        <img class="doodle doodle-07" src="./assets/epilogue-doodle-07.png" alt="" />
+        <img class="doodle doodle-08" src="./assets/epilogue-doodle-08.png" alt="" />
+        <img class="doodle doodle-09" src="./assets/epilogue-doodle-09.png" alt="" />
+        <img class="doodle doodle-10" src="./assets/epilogue-doodle-10.png" alt="" />
+      </div>
+
+      <section id="epilogueMenu" class="epilogue-menu view is-active" aria-label="尾声菜单">
+        <h1>EPILOGUE</h1>
+        <div class="entry-list">
+          <button id="memoryEntry" class="epilogue-entry primary" type="button">
+            <span>01</span><strong>TAKE THIS WITH YOU</strong><i>今日纪念卡</i>
+          </button>
+          <button id="letterEntry" class="epilogue-entry" type="button">
+            <span>02</span><strong>A LETTER FROM THE CREATOR</strong><i>制作者来信</i>
+          </button>
+          <button id="mainMenuEntry" class="epilogue-entry home-entry" type="button">
+            <span aria-hidden="true">↩</span><strong>RETURN TO MAIN MENU</strong><i>回到主界面</i>
+          </button>
+        </div>
+        <p class="menu-note">主线已经结束。这里的内容不会改变任何游戏变量。</p>
+      </section>
+
+      <section id="memoryPanel" class="panel memory-panel view" aria-label="今日纪念卡">
+        <header class="panel-toolbar">
+          <button class="panel-back" type="button" data-close="memoryPanel">← BACK</button>
+          <p>TAKE THIS WITH YOU</p>
+          <button id="saveMemory" class="toolbar-action" type="button">SAVE PNG</button>
+        </header>
+
+        <article id="memoryCard" class="memory-card">
+          <div class="memory-stars" aria-hidden="true">
+            <i class="memory-star star-a">✦</i>
+            <i class="memory-star star-b">✦</i>
+            <i class="memory-star star-c">✦</i>
+            <i class="memory-star star-d">✦</i>
+            <i class="memory-star star-e">✦</i>
+          </div>
+          <header class="memory-header">
+            <div>
+              <p class="memory-kicker">A SMALL RECORD OF TODAY</p>
+              <h2>OUR DAY IN ORBIT</h2>
+            </div>
+            <div class="memory-date"><b>10 / 12</b><span>with JONGHO</span></div>
+          </header>
+
+          <div class="memory-body">
+            <section class="memory-visual">
+              <!-- INTEGRATION SLOT: orbit:beachPhoto / selected polaroid frame -->
+              <div class="polaroid">
+                <img id="memoryPhoto" alt="今天在海边拍下的照片" />
+                <div id="photoFallback" class="photo-fallback"><b>15:00</b><span>AT THE BEACH</span></div>
+                <p>the moment we kept · <span id="photoFrameLabel">FRAME 01</span></p>
+              </div>
+              <blockquote id="cardQuote">“生日快乐，愿你一直幸福。”</blockquote>
+              <p class="quote-signature">— <span id="cardSignature">ATINY</span></p>
+            </section>
+
+            <section class="memory-record">
+              <h3>TODAY'S ORBIT</h3>
+              <ol class="timeline">
+                <li><time>10:12</time><p>拉开窗帘，叫醒钟浩<br />为他选了 <strong id="timelineOutfit">格子衬衫</strong></p></li>
+                <li><time>11:30</time><p>一起走过长街<br />带上了 <strong id="timelineDrink">美式咖啡</strong></p></li>
+                <li><time>12:30</time><p>一起吃午餐<br />选择了 <strong id="timelineLunch">猪蹄</strong></p></li>
+                <li><time>15:00</time><p>在海边按下快门<br />留下今天的拍立得</p></li>
+                <li><time>23:55</time><p>陪他走到生日的最后一刻<br />一起说下“행복하자!”</p></li>
+              </ol>
+            </section>
+          </div>
+
+          <footer class="memory-footer">
+            <div class="memory-tag"><small>OUTFIT</small><b id="outfitValue">格子衬衫</b></div>
+            <div class="memory-tag"><small>DRINK</small><b id="drinkValue">美式咖啡</b></div>
+            <div class="memory-tag"><small>LUNCH</small><b id="lunchValue">猪蹄</b></div>
+            <div class="memory-tag wide"><small>CAKE</small><b id="cakeValue">亲手装饰的小熊蛋糕</b></div>
+            <p class="memory-closing" lang="en" data-fixed-language="en">THANK YOU FOR SPENDING TODAY WITH JONGHO.</p>
+          </footer>
+          <span id="demoBadge" class="demo-badge">GRAYBOX SAMPLE DATA</span>
+        </article>
+      </section>
+
+      <section id="letterPanel" class="panel letter-panel view" aria-label="制作者来信">
+        <header class="panel-toolbar">
+          <button class="panel-back" type="button" data-close="letterPanel">← BACK</button>
+          <p>A LETTER FROM THE CREATOR</p>
+          <span class="toolbar-spacer"></span>
+        </header>
+
+        <article class="letter-sheet">
+          <img class="letter-watermark" src="./assets/waterlogo.png" alt="" aria-hidden="true" />
+          <div class="letter-scroll">
+            <p class="letter-label">A LETTER FROM THE CREATOR</p>
+            <h2>To everyone who stayed until the end,</h2>
+
+            <p class="lead">非常感谢你能够玩到这里！</p>
+
+            <p>这是一个非常粗糙的小游戏吧 hh。因为思考着“怎么才能让不管在哪里的 ATINY 都能一起度过钟浩的生日呢”，只会普通地画画的我，学着做出了 <strong>ORBIT 10:12</strong>。</p>
+
+            <p>就像这个名字一样，这是一个围绕着这一天、围绕着钟浩展开的小故事。和钟浩共度时光，听着钟浩唱歌，共同积累美好的回忆——这是身为喜爱着钟浩的粉丝最大的愿望。就算是在制作过程中调试了一万次的我，在做到最后一幕的时候也被感动了呢 hh。</p>
+
+            <p>游戏里藏了很多小彩蛋。如果觉得全部找出来有些困难，也可以在 X 找到我发布的攻略～原本还有更多想要呈现的东西，但是因为一个人的精力实在有限 &gt;&lt; 希望未来能够做出更加成熟的作品。</p>
+
+            <p>同时也非常感谢 Codex 的帮助，让作为 coding 初学者的我，能够把心中所想一点点具象化。感谢我的朋友 <strong>nana7_7</strong> 和 <strong>大喷菇</strong>，在 Street 场景中为我提供了可爱的简笔画。</p>
+
+            <p>最后，也感谢钟浩，让来自不同地方的我们感受到了同样一份幸福。也祝 ATEEZ 11月13日回归顺利！</p>
+
+            <p class="letter-ending">那么，<strong>사랑해! 행복하자!</strong></p>
+
+            <p class="contact">如果有游戏相关的问题或 Bug 报错，可以联系 X：<a href="https://x.com/okalenO01012" target="_blank" rel="noreferrer">@okalenO01012</a></p>
+
+            <div class="letter-signature">
+              <span>From,</span>
+              <strong>okalenO</strong>
+              <small>2026.10.12</small>
+            </div>
+
+            <footer class="letter-credits">
+              <p>本项目的程序实现由制作者在 OpenAI Codex 辅助下完成。</p>
+              <p>海边场景的背景照片分别设于济州岛 / 泽西岛。</p>
+              <p>Street 场景交互设计参考：<a href="https://github.com/andrewwoan/mr-pandas-psychologically-safe-portfolio" target="_blank" rel="noreferrer">Andrew Woan / mr-pandas-psychologically-safe-portfolio</a></p>
+            </footer>
+          </div>
+        </article>
+      </section>
+
+      <p class="ai-credit">Fan-made birthday project · Coding assisted by OpenAI Codex</p>
+      <p id="grayboxNotice" class="graybox-notice" role="status" aria-live="polite"></p>
+      <div class="rotate-note">横屏观看效果更完整<br /><small>请旋转手机</small></div>
+      <canvas id="memoryCanvas" width="1600" height="2000" hidden></canvas>
+    </section>
+  </main>
+  <script src="./app.js?v=20261012-1"></script>
+</body>
+</html>

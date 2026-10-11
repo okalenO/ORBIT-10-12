@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f2efe7" />
     <title>ORBIT 10.12 — 长街灰盒 v5</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20261012-2" />
   </head>
   <body>
     <main id="app" aria-label="长街散步">
@@ -63,6 +63,7 @@
             <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 8 12 20l12 12M13 20h20" /></svg>
           </button>
         </header>
+        <p class="scene-bgm-credit">BGM · Good Day</p>
 
         <div class="control-hint">
           <span class="mouse-hint" data-copy="滚轮控制前后移动">滚轮控制前后移动</span>
@@ -102,7 +103,7 @@
         </div>
 
         <section id="transition" class="transition is-active" aria-label="场景转场">
-          <video id="transitionVideo" muted autoplay playsinline preload="auto">
+          <video id="transitionVideo" muted playsinline preload="auto">
             <source src="./assets/street-transition.mp4" type="video/mp4" />
           </video>
           <div class="transition-copy">
@@ -117,6 +118,6 @@
     </main>
     <script src="./copy.js"></script>
     <script src="./scenery.js"></script>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20261012-1"></script>
   </body>
 </html>

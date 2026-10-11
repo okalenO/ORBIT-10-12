@@ -283,6 +283,7 @@
 
   function scheduleVisualTransition() {
     window.setTimeout(() => {
+      bridge?.onSceneReady?.();
       scene.classList.add("is-visible");
       transition.classList.add("is-leaving");
       scheduleBirdFlock();
@@ -606,7 +607,29 @@
       window.ORBIT_BEACH_COMPLETE = detail;
       window.dispatchEvent(new CustomEvent("orbit:beach-complete", { detail }));
       if (typeof window.ORBIT_GO_TO_NEXT_SCENE === "function") window.ORBIT_GO_TO_NEXT_SCENE(detail);
-    }, 850);
+    }, 1150);
+  }
+
+  function resumeFromFinale() {
+    document.documentElement.classList.remove("is-scene-paused");
+    document.body.classList.remove("is-next-scene", "is-returning");
+    state.phase = "ending";
+    finalPanel.classList.remove("is-active", "is-put-away");
+    finalPanel.setAttribute("aria-hidden", "true");
+    introCharacterArt.src = standingSrc();
+    introCharacter.className = "intro-character is-standing is-idle";
+    setMainAction(true, goNextScene, "go");
+    if (state.soundOn) {
+      tryPlayOcean();
+      fadeOceanTo(1, 900);
+    }
+  }
+
+  function pauseForFinale() {
+    document.documentElement.classList.add("is-scene-paused");
+    oceanAudio.pause();
+    ejectAudio.pause();
+    chimeAudio.pause();
   }
 
   async function savePhoto() {
@@ -741,6 +764,8 @@
       }
       applyLanguage();
     },
+    resumeFromFinale,
+    pauseForFinale,
   };
 
   introCharacterArt.src = standingSrc();

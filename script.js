@@ -62,6 +62,105 @@ let language = "en";
 let bgmEnabled = true;
 let transitionTimer;
 
+const orbitSceneBgm = (() => {
+  const tracks = {
+    menu: { src: "assets/audio/bgm/all-about-you.mp3", volume: .18 },
+    bedroom: { src: "assets/audio/bgm/bedroom-lullaby.mp3", volume: .14 },
+    street: { src: "assets/audio/bgm/good-day.mp3", volume: .16 },
+    restaurant: { src: "assets/audio/bgm/beyond-the-sea.mp3", volume: .09 },
+    epilogue: { src: "assets/audio/bgm/all-about-you.mp3", volume: .18 },
+  };
+  const players = new Map();
+  let desiredKey = "menu";
+  let activeKey = null;
+  let unlocked = false;
+
+  function playerFor(key) {
+    if (!tracks[key]) return null;
+    if (!players.has(key)) {
+      const audio = new Audio(tracks[key].src);
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.playsInline = true;
+      players.set(key, audio);
+    }
+    return players.get(key);
+  }
+
+  function fade(audio, target, duration, pauseAfter = false, resetAfter = false) {
+    if (!audio) return;
+    const fadeId = (audio._orbitFadeId || 0) + 1;
+    audio._orbitFadeId = fadeId;
+    const start = audio.volume;
+    const startedAt = performance.now();
+    const step = now => {
+      if (audio._orbitFadeId !== fadeId) return;
+      const progress = Math.max(0, Math.min(1, (now - startedAt) / Math.max(1, duration)));
+      audio.volume = Math.max(0, Math.min(1, start + (target - start) * (1 - Math.pow(1 - progress, 2))));
+      if (progress < 1) requestAnimationFrame(step);
+      else if (pauseAfter) {
+        audio.pause();
+        if (resetAfter) audio.currentTime = 0;
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
+  async function enter(key, duration = 1200) {
+    desiredKey = key;
+    const next = playerFor(key);
+    if (!next || !unlocked || !bgmEnabled) return;
+    if (activeKey === key) {
+      if (next.paused) await next.play().catch(() => {});
+      fade(next, tracks[key].volume, duration);
+      return;
+    }
+    const previousKey = activeKey;
+    const previous = previousKey ? playerFor(previousKey) : null;
+    activeKey = key;
+    next.currentTime = 0;
+    next.volume = 0;
+    await next.play().catch(() => {});
+    if (activeKey !== key || !bgmEnabled) return;
+    fade(next, tracks[key].volume, duration);
+    if (previous && previous !== next) fade(previous, 0, Math.min(duration, 1000), true, true);
+  }
+
+  function stop(duration = 1000) {
+    desiredKey = null;
+    if (!activeKey) return;
+    const previous = playerFor(activeKey);
+    activeKey = null;
+    fade(previous, 0, duration, true, true);
+  }
+
+  function setEnabled(enabled) {
+    if (!enabled) {
+      players.forEach(audio => fade(audio, 0, 320, true, false));
+      return;
+    }
+    if (desiredKey) enter(desiredKey, 600);
+  }
+
+  function preload(key) {
+    const audio = playerFor(key);
+    if (audio?.readyState === HTMLMediaElement.HAVE_NOTHING) audio.load();
+  }
+
+  function unlock() {
+    unlocked = true;
+    window.setTimeout(() => {
+      if (bgmEnabled && desiredKey) enter(desiredKey, 850);
+    }, 0);
+  }
+
+  document.addEventListener("pointerdown", unlock, { once: true, capture: true });
+  document.addEventListener("keydown", unlock, { once: true, capture: true });
+  preload("menu");
+  preload("bedroom");
+  return { enter, stop, preload, setEnabled, current: () => desiredKey };
+})();
+
 function applyLanguage(nextLanguage) {
   language = copy[nextLanguage] ? nextLanguage : "en";
   document.documentElement.lang = language;
@@ -91,6 +190,7 @@ function toggleBgm() {
   bgmEnabled = !bgmEnabled;
   bgmButton.setAttribute("aria-pressed", String(bgmEnabled));
   bgmState.textContent = bgmEnabled ? copy[language].on : copy[language].off;
+  orbitSceneBgm.setEnabled(bgmEnabled);
   window.dispatchEvent(new CustomEvent("orbit-bgm-change", { detail: { enabled: bgmEnabled } }));
 }
 
@@ -99,14 +199,16 @@ function startGame() {
   languageControl.classList.remove("is-open");
   stage.classList.add("is-transitioning");
   transitionTimer = window.setTimeout(() => {
-    stage.classList.add("is-bedroom");
     window.enterBedroomScene?.();
+    requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.add("is-bedroom")));
   }, 1840);
 }
 
 function resetMenu() {
   window.clearTimeout(transitionTimer);
   window.resetBeachScene?.();
+  window.resetEpilogueScene?.();
+  window.resetFinaleScene?.();
   window.resetRestaurantScene?.();
   window.resetStreetScene?.();
   window.resetDressupScene?.();
@@ -116,6 +218,7 @@ function resetMenu() {
   window.orbitGameState.restaurantResult = null;
   window.orbitGameState.beachResult = null;
   stage.classList.remove("is-bedroom", "is-transitioning", "is-dressup");
+  orbitSceneBgm.enter("menu");
 }
 
 languageButton.addEventListener("click", toggleLanguageMenu);
@@ -150,3 +253,4 @@ window.orbitMenu = {
   toggleBgm,
   resetMenu,
 };
+window.orbitBgm = orbitSceneBgm;

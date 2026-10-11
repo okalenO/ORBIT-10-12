@@ -127,6 +127,7 @@
     hasTentacle: false,
     overlayOpen: false,
     transitionActive: true,
+    transitionFinishing: false,
     paused: Boolean(settings.paused),
     soundOn: settings.sound,
     pointerDown: false,
@@ -138,6 +139,7 @@
     lastInteractionX: NaN,
     lastInteractionTime: 0,
     lastRoadX: NaN,
+    lastRoadDrawTime: 0,
     lastTime: performance.now(),
     look: { x: 0, y: 0, targetX: 0, targetY: 0 },
     activation: new Map(sceneItems.map((item) => [item.id, { armed: true, nearAnnounced: false }])),
@@ -167,11 +169,17 @@
       if (!aniteezGroups.has(id)) aniteezGroups.set(id, []);
       aniteezGroups.get(id).push(element);
     });
-    worldVisuals = Array.from($$(".prop,.scene-decor,.world-cloud,.world-balloon")).map(element => ({
-      element,
-      x: Number.parseFloat(element.style.left) || 0,
-      visible: null,
-    }));
+    worldVisuals = Array.from($$(".prop,.scene-decor,.world-cloud,.world-balloon,.street-bike,.ocean-zone,.wave-row")).map(element => {
+      const x = Number.parseFloat(element.style.left) || 0;
+      const width = element.offsetWidth || 0;
+      const leftAnchored = element.matches(".world-cloud,.world-balloon,.ocean-zone,.wave-row");
+      return {
+        element,
+        start: leftAnchored ? x : x - width / 2,
+        end: leftAnchored ? x + width : x + width / 2,
+        visible: null,
+      };
+    });
     updateVisibleWorld(mod(state.position, TRACK_W));
   }
 
@@ -180,10 +188,11 @@
     const minX = worldCenter - PLAYER_X - 900;
     const maxX = worldCenter + (STAGE_W - PLAYER_X) + 900;
     worldVisuals.forEach(entry => {
-      const visible = entry.x >= minX && entry.x <= maxX;
+      const visible = entry.end >= minX && entry.start <= maxX;
       if (entry.visible === visible) return;
       entry.visible = visible;
       entry.element.style.visibility = visible ? "visible" : "hidden";
+      entry.element.classList.toggle("is-offscreen", !visible);
     });
   }
 
@@ -222,6 +231,7 @@
 
   const roadTextureImage = new Image();
   let roadPattern = null;
+  const roadPatternTransform = new DOMMatrix();
   roadTextureImage.src = "./assets/street-road-fill.png";
   roadTextureImage.addEventListener("load", () => {
     roadPattern = roadContext.createPattern(roadTextureImage, "repeat");
@@ -237,9 +247,18 @@
     }
   }
 
-  function drawRoad(localX) {
-    if (Math.abs(localX - state.lastRoadX) < .8) return;
+  function drawRoad(localX, now) {
+    if (Math.abs(localX - state.lastRoadX) < .8) {
+      roadCanvas.style.transform = "translate3d(0,0,0)";
+      return;
+    }
+    if (now - state.lastRoadDrawTime < 28 && Number.isFinite(state.lastRoadX)) {
+      roadCanvas.style.transform = `translate3d(${(state.lastRoadX - localX).toFixed(2)}px,0,0)`;
+      return;
+    }
     state.lastRoadX = localX;
+    state.lastRoadDrawTime = now;
+    roadCanvas.style.transform = "translate3d(0,0,0)";
     roadContext.setTransform(1, 0, 0, 1, 0, 0);
     roadContext.clearRect(0, 0, roadCanvas.width, roadCanvas.height);
     roadContext.setTransform(ROAD_RENDER_SCALE, 0, 0, ROAD_RENDER_SCALE, 0, 0);
@@ -248,7 +267,11 @@
     roadContext.lineTo(-48, STAGE_H);
     roadContext.closePath();
     if (roadPattern) {
-      if (roadPattern.setTransform) roadPattern.setTransform(new DOMMatrix().translate(mod(PLAYER_X - localX, 1754), 0));
+      if (roadPattern.setTransform) {
+        roadPatternTransform.e = mod(PLAYER_X - localX, 1754);
+        roadPatternTransform.f = 0;
+        roadPattern.setTransform(roadPatternTransform);
+      }
       roadContext.fillStyle = roadPattern;
     } else {
       roadContext.fillStyle = "#d8cfae";
@@ -658,9 +681,6 @@
   }
 
   function enterRestaurant() {
-    restaurantOverlay.classList.remove("is-open");
-    restaurantOverlay.setAttribute("aria-hidden", "true");
-    state.overlayOpen = false;
     stage.classList.add("is-handing-off");
     if (bridge?.enterRestaurant) bridge.enterRestaurant();
     else closeRestaurant();
@@ -816,10 +836,15 @@
     const billboardCoverEnd = 8330;
     const coverOpacity = 1 - smoothstep((x - billboardCoverStart) / (billboardCoverEnd - billboardCoverStart));
     const opacity = cycle < .8 ? .88 * coverOpacity : 0;
+    const worldCenter = mod(state.position, TRACK_W) + TRACK_W;
     busElements.forEach((bus) => {
       const offset = Number(bus.dataset.copyOffset || 0);
+      const worldX = x + offset;
+      const visible = opacity > 0 && worldX > worldCenter - PLAYER_X - 650 && worldX < worldCenter + (STAGE_W - PLAYER_X) + 650;
+      bus.style.visibility = visible ? "visible" : "hidden";
+      if (!visible) return;
       bus.style.opacity = opacity.toFixed(3);
-      bus.style.transform = `translate3d(${(x + offset).toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,-100%) rotate(${angle.toFixed(2)}deg) scaleX(-1)`;
+      bus.style.transform = `translate3d(${worldX.toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,-100%) rotate(${angle.toFixed(2)}deg) scaleX(-1)`;
     });
   }
 
@@ -849,7 +874,7 @@
     state.wasInOcean = inOcean;
     const slopeAngle = Math.max(-6, Math.min(6, routeAngle(localX) * .47));
     const motionLean = Math.max(-2.5, Math.min(2.5, state.velocity * .07));
-    drawRoad(localX);
+    drawRoad(localX, now);
     world.style.transform = `translate3d(${(PLAYER_X - (localX + TRACK_W)).toFixed(2)}px,0,0)`;
     foregroundLayer.style.transform = world.style.transform;
     characterRig.style.transform = `translate3d(0,${y.toFixed(2)}px,0) rotate(${(slopeAngle + motionLean).toFixed(2)}deg)`;
@@ -945,25 +970,92 @@
     chimeAudio.play().catch(() => {});
   }
   function endTransition() {
-    if (!state.transitionActive || transition.classList.contains("is-leaving")) return;
+    if (!state.transitionActive || state.transitionFinishing) return;
+    state.transitionFinishing = true;
     window.clearTimeout(transitionFallbackTimer);
-    transition.classList.add("is-leaving");
-    window.setTimeout(() => {
-      state.transitionActive = false;
-      transition.classList.remove("is-active", "is-leaving");
-      transition.setAttribute("aria-hidden", "true");
-      transitionVideo.pause();
-    }, 1160);
+    state.paused = false;
+    state.lastTime = performance.now();
+    document.documentElement.classList.remove("is-preloaded");
+    requestAnimationFrame(() => {
+      bridge?.onSceneReady?.();
+      transition.classList.add("is-leaving");
+      window.setTimeout(() => {
+        state.transitionActive = false;
+        state.transitionFinishing = false;
+        transition.classList.remove("is-active", "is-leaving");
+        transition.setAttribute("aria-hidden", "true");
+        transitionVideo.pause();
+      }, 1160);
+    });
   }
 
-  function restartTransition() {
+  function waitForSceneAssets() {
+    const uniqueImages = new Map();
+    Array.from(document.images).forEach(image => {
+      const source = image.currentSrc || image.src;
+      if (source && !uniqueImages.has(source)) uniqueImages.set(source, image);
+    });
+    const imagesReady = Promise.allSettled(Array.from(uniqueImages.values()).map(image => {
+      if (image.complete && image.naturalWidth) return image.decode?.() || Promise.resolve();
+      return new Promise(resolve => {
+        image.addEventListener("load", resolve, { once:true });
+        image.addEventListener("error", resolve, { once:true });
+      });
+    }));
+    const fontsReady = document.fonts?.ready || Promise.resolve();
+    return Promise.race([
+      Promise.allSettled([imagesReady, fontsReady]),
+      new Promise(resolve => window.setTimeout(resolve, 4500)),
+    ]);
+  }
+
+  function waitForVideoReady() {
+    if (transitionVideo.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return Promise.resolve();
+    return new Promise(resolve => {
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        transitionVideo.removeEventListener("canplay", finish);
+        transitionVideo.removeEventListener("error", finish);
+        resolve();
+      };
+      transitionVideo.addEventListener("canplay", finish, { once:true });
+      transitionVideo.addEventListener("error", finish, { once:true });
+      window.setTimeout(finish, 2600);
+      transitionVideo.load();
+    });
+  }
+
+  async function prepareTransition() {
+    document.documentElement.classList.add("is-preloaded");
+    transitionVideo.pause();
+    transitionVideo.defaultPlaybackRate = 1;
+    transitionVideo.playbackRate = 1;
+    if (transitionVideo.currentTime !== 0) transitionVideo.currentTime = 0;
+    await Promise.allSettled([waitForVideoReady(), waitForSceneAssets()]);
+  }
+
+  async function restartTransition() {
     window.clearTimeout(transitionFallbackTimer);
     state.transitionActive = true;
+    state.transitionFinishing = false;
     transition.classList.remove("is-leaving");
     transition.classList.add("is-active");
     transition.setAttribute("aria-hidden", "false");
+    transitionVideo.pause();
+    transitionVideo.defaultPlaybackRate = 1;
+    transitionVideo.playbackRate = 1;
     transitionVideo.currentTime = 0;
-    transitionVideo.play().catch(() => {});
+    await waitForVideoReady();
+    const firstFrame = new Promise(resolve => {
+      let finished = false;
+      const done = () => { if (!finished) { finished = true; resolve(); } };
+      if (typeof transitionVideo.requestVideoFrameCallback === "function") transitionVideo.requestVideoFrameCallback(done);
+      window.setTimeout(done, 300);
+    });
+    await transitionVideo.play().catch(() => {});
+    await firstFrame;
     transitionFallbackTimer = window.setTimeout(endTransition, 9400);
   }
 
@@ -991,15 +1083,32 @@
     transitionVideo.addEventListener("ended", endTransition);
     transitionVideo.addEventListener("error", () => window.setTimeout(endTransition, 1600));
     $("#skipTransition").addEventListener("click", endTransition);
-    transitionFallbackTimer = window.setTimeout(endTransition, 9400);
   }
 
   window.orbitStreetScene = {
     setLanguage(next) { language = next; syncCopy(); },
     setSound(enabled) { state.soundOn = enabled; $("#soundButton").classList.toggle("is-off", !enabled); },
-    setPreloaded(paused) { state.paused = Boolean(paused); if (state.paused) transitionVideo.pause(); },
-    activate(outfit) { if (outfit) setOutfit(outfit); state.paused = false; state.lastTime = performance.now(); restartTransition(); },
-    clearHandoff() { stage.classList.remove("is-handing-off"); },
+    setPreloaded(paused) { state.paused = Boolean(paused); if (state.paused) { transitionVideo.pause(); document.documentElement.classList.add("is-preloaded"); } },
+    prepareTransition,
+    setPaused(paused) {
+      state.paused = Boolean(paused);
+      document.documentElement.classList.toggle("is-scene-paused", state.paused);
+      if (state.paused) transitionVideo.pause();
+      else state.lastTime = performance.now();
+    },
+    async activate(outfit) { if (outfit) setOutfit(outfit); state.paused = true; await restartTransition(); },
+    clearHandoff() { stage.classList.remove("is-handing-off"); closeRestaurant(); },
+    resumeFromRestaurant() {
+      state.paused = false;
+      state.lastTime = performance.now();
+      document.documentElement.classList.remove("is-scene-paused");
+      state.transitionActive = false;
+      transitionVideo.pause();
+      transition.classList.remove("is-active", "is-leaving");
+      transition.setAttribute("aria-hidden", "true");
+      stage.classList.remove("is-handing-off");
+      closeRestaurant();
+    },
     snapshot: () => ({ outfit: state.outfit, selectedDrink: state.selectedDrink, lap: state.lap }),
   };
   buildProps();

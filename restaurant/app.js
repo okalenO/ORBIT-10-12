@@ -267,6 +267,7 @@
   function finishTransition() {
     if (state.transitionFinished) return;
     state.transitionFinished = true;
+    bridge?.onSceneReady?.();
     scene.classList.add("is-revealed");
     transition.classList.add("is-leaving");
     later(() => {
@@ -467,7 +468,7 @@
     later(() => {
       waiter.classList.add("is-offstage");
       cakeWorkbench.classList.remove("is-active");
-      setBackground("bg1");
+      setBackground("bg2");
     }, 6750);
     later(() => {
       waiter.classList.remove("is-leaving", "has-cake");
@@ -631,6 +632,12 @@
       updateSoundButton();
     },
     resumeFromBeach,
+    setPaused(paused) {
+      document.documentElement.classList.toggle("is-scene-paused", Boolean(paused));
+      const audio = $("#bgmAudio");
+      if (paused) audio?.pause();
+      else if (state.soundOn) audio?.play().catch(() => {});
+    },
   };
 
   initializeCakePieces();

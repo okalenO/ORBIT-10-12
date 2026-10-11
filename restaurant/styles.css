@@ -57,6 +57,7 @@ button:focus-visible { outline: 4px solid #d8ed75; outline-offset: 5px; }
 .sound-button .sound-wave, .back-button path { fill: none; }
 .sound-button.is-muted .sound-wave { opacity: 0; }
 .sound-button.is-muted::after { content: ""; position: absolute; width: 38px; height: 3px; margin: -23px 0 0 -18px; background: currentColor; transform: rotate(-42deg); border-radius: 5px; }
+.scene-bgm-credit { position:absolute; z-index:36; top:38px; right:43px; margin:0; color:rgba(111,134,80,.82); font:700 14px/1.2 Georgia,serif; letter-spacing:.04em; text-shadow:0 1px 2px rgba(18,10,6,.46); pointer-events:none; }
 .table-menu {
   position: absolute; left: 51%; bottom: -42px; z-index: 9; width: 510px; height: 408px; padding: 0; border: 0;
   background: transparent; transform: translateX(-50%) perspective(820px) rotateX(61deg) rotateZ(-7deg) scale(.9);
@@ -359,6 +360,9 @@ body.is-returning::after { opacity:1; }
   filter: drop-shadow(6px 0 0 #fff) drop-shadow(-6px 0 0 #fff) drop-shadow(0 6px 0 #fff) drop-shadow(0 -6px 0 #fff) drop-shadow(10px 12px 0 rgba(42,24,16,.2));
 }
 .piping-bag.is-piping { animation: piping-circle 4.2s cubic-bezier(.45,.02,.35,1) forwards; pointer-events: none; }
+.piping-bag.is-piping {
+  filter: drop-shadow(5px 0 0 #fff) drop-shadow(-5px 0 0 #fff) drop-shadow(0 5px 0 #fff) drop-shadow(0 -5px 0 #fff) drop-shadow(10px 12px 0 rgba(42,24,16,.2));
+}
 .piping-bag.is-complete { opacity: .38; filter: grayscale(.2) drop-shadow(7px 8px 0 rgba(42,24,16,.15)); cursor: default; }
 .cake-workbench.is-locked .piping-bag { pointer-events: none; }
 .cake-workbench.is-handing-over .piping-bag,
@@ -430,3 +434,4 @@ body.is-returning::after { opacity:1; }
   .rotate-note small { font-size:.58em; color:var(--green-bright); }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:1ms !important; animation-iteration-count:1 !important; transition-duration:1ms !important; } }
+html.is-scene-paused *, html.is-scene-paused *::before, html.is-scene-paused *::after { animation-play-state: paused !important; }

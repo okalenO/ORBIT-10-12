@@ -43,10 +43,11 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
   transform: translate3d(0,0,0); transform-origin: left top;
 }
 .sky-world-layer { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.road-canvas { position: fixed; left: 0; top: 0; z-index: 1; width: 1920px; height: 1080px; pointer-events: none; }
+.road-canvas { position: fixed; left: 0; top: 0; z-index: 1; width: 1920px; height: 1080px; pointer-events: none; will-change: transform; }
 .ocean-layer { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .props-layer { position: absolute; inset: 0; z-index: 3; }
 .foreground-world { position: absolute; left: 0; top: 0; width: 44400px; height: 1350px; z-index: 12; transform: translate3d(0,0,0); transform-origin: left top; pointer-events: none; }
+.is-offscreen, .is-offscreen * { animation-play-state: paused !important; }
 
 .stage::after { content: ""; position: absolute; inset: 0; z-index: 99; background: #f6efe0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .65s ease, visibility 0s .65s; }
 .stage.is-handing-off::after { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
@@ -182,6 +183,7 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .hud-button:hover { transform: scale(1.12) rotate(-3deg); }
 .hud-button svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
 .hud-button.is-off { opacity: .42; }
+.scene-bgm-credit { position:absolute; z-index:41; top:36px; right:44px; margin:0; color:rgba(79,116,29,.76); font:700 14px/1.2 Georgia,serif; letter-spacing:.04em; pointer-events:none; }
 .control-hint { position: absolute; left: 50%; bottom: 34px; z-index: 42; transform: translateX(-50%); padding: 10px 20px 13px; border: 3px solid var(--ink); background: rgba(242,239,231,.86); font-size: 18px; font-weight: 1000; pointer-events: none; animation: hint-fade 6s ease forwards; }
 .control-hint i { position: absolute; left: 50%; top: -24px; width: 31px; height: 31px; border-left: 4px solid var(--ink); border-top: 4px solid var(--ink); transform: translateX(-50%) rotate(45deg); animation: hint-nudge 1.4s ease-in-out infinite alternate; }
 .touch-hint { display: none; }
@@ -209,7 +211,7 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .name--strawberry { left: 51%; top: 89%; transform: rotate(-1deg); }
 .doodle-star { position: absolute; z-index: 6; color: #f5ead4; font-size: 43px; font-style: normal; animation: star-twinkle 1.6s ease-in-out infinite alternate; }
 .star--one { left: 57%; top: 37%; }.star--two { left: 29%; top: 72%; animation-delay: -.5s; }.star--three { right: 8%; top: 30%; animation-delay: -.9s; }
-.menu-bear-text { position: absolute; z-index: 9; left: 20.5%; top: 71.2%; width: 22.5%; margin: 0; color: #4d3a33; font-size: 25px; line-height: 1.24; font-weight: 1000; text-align: center; transform: rotate(-2deg); opacity: 0; }
+.menu-bear-text { position: absolute; z-index: 9; left: 20.5%; top: 74.2%; width: 22.5%; margin: 0; color: #4d3a33; font-size: 25px; line-height: 1.24; font-weight: 1000; text-align: center; transform: rotate(-2deg); opacity: 0; }
 .menu-bear-text.is-visible { opacity: 1; animation: bear-text-pop .45s cubic-bezier(.2,1.4,.35,1); }
 .confirm-drink { position: absolute; z-index: 10; right: 4%; bottom: 4%; padding: 13px 23px; border: 3px solid var(--ink); background: #f4eddc; font-size: 20px; font-weight: 1000; transform: rotate(3deg); cursor: pointer; }
 .confirm-drink:disabled { opacity: .28; cursor: not-allowed; }
@@ -223,7 +225,7 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .transition.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
 .transition.is-leaving { clip-path: inset(0 100% 0 0); visibility: visible; }
 .transition::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(15,43,31,.58),transparent 58%); pointer-events: none; }
-.transition video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: video-fade-in 1.35s ease forwards; }
+.transition video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1; }
 .transition-copy { position: absolute; z-index: 2; left: 105px; top: 62%; transform: translateY(-50%); color: var(--green); text-shadow: none; }
 .transition-copy p { margin: 0 0 14px; font-size: 46px; font-weight: 1000; letter-spacing: .13em; }
 .transition-copy h1 { margin: 0; font-size: 126px; line-height: .95; letter-spacing: .035em; }
@@ -237,7 +239,8 @@ button:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
 .prop--cat .prop-visual { animation: prop-float 3.7s ease-in-out infinite; }
 .prop--gift .prop-visual { animation: none !important; }
 
-@keyframes video-fade-in { to { opacity: 1; } }
+html.is-preloaded *, html.is-preloaded *::before, html.is-preloaded *::after { animation-play-state: paused !important; }
+html.is-scene-paused *, html.is-scene-paused *::before, html.is-scene-paused *::after { animation-play-state: paused !important; }
 @keyframes cloud-wander { from { translate: -35px 0; rotate: -.8deg; } to { translate: 75px 9px; rotate: .8deg; } }
 @keyframes street-balloon { from { translate: 0 28px; rotate: -4deg; } to { translate: 22px -95px; rotate: 5deg; } }
 @keyframes grass-breathe { from { transform: translate(-50%,-100%) rotate(-1.1deg); } to { transform: translate(-50%,-100%) rotate(1.1deg); } }

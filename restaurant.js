@@ -11,13 +11,16 @@
   }
 
   function hideRestaurant() {
+    frame.contentWindow?.orbitRestaurantScene?.setPaused?.(true);
     scene.classList.remove('is-active');
     scene.setAttribute('aria-hidden', 'true');
   }
 
   function resumeRestaurant() {
     window.orbitGameState.currentScene = 'restaurant';
+    window.orbitBgm?.enter?.('restaurant');
     frame.contentWindow?.orbitRestaurantScene?.resumeFromBeach?.();
+    frame.contentWindow?.orbitRestaurantScene?.setPaused?.(false);
     scene.setAttribute('aria-hidden', 'false');
     scene.classList.add('is-preparing');
     void scene.offsetWidth;
@@ -33,6 +36,7 @@
       sound: window.orbitMenu.getBgmEnabled(),
     }),
     enter: () => {
+      window.orbitStreet?.pause?.();
       window.orbitGameState.currentScene = 'restaurant';
       scene.setAttribute('aria-hidden', 'false');
       scene.classList.add('is-preparing');
@@ -41,8 +45,10 @@
         requestAnimationFrame(() => requestAnimationFrame(() => {
           scene.classList.add('is-active');
           scene.classList.remove('is-preparing');
-          window.orbitStreet?.clearHandoff?.();
-          window.setTimeout(() => window.orbitStreet?.hideForRestaurant(), 900);
+          window.setTimeout(() => {
+            window.orbitStreet?.hideForRestaurant();
+            window.orbitStreet?.clearHandoff?.();
+          }, 680);
         }));
       }, { once: true });
       frame.src = 'restaurant/index.html';
@@ -55,6 +61,7 @@
       }, 600);
     },
     hideForBeach: hideRestaurant,
+    pauseForBeach: () => frame.contentWindow?.orbitRestaurantScene?.setPaused?.(true),
     resume: resumeRestaurant,
     playBeachChime: () => {
       if (!window.orbitMenu.getBgmEnabled()) return;
@@ -65,6 +72,7 @@
     goToBeach: () => window.orbitBeach?.enter(),
     setLanguage: language => window.orbitMenu.setLanguage(language),
     toggleSound: () => window.orbitMenu.toggleBgm(),
+    onSceneReady: () => window.orbitBgm?.enter?.('restaurant'),
     updateResult: result => { window.orbitGameState.restaurantResult = result; },
   };
 
