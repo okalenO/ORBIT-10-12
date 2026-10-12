@@ -64,11 +64,12 @@ let transitionTimer;
 
 const orbitSceneBgm = (() => {
   const tracks = {
-    menu: { src: "assets/audio/bgm/all-about-you.mp3", volume: .18 },
-    bedroom: { src: "assets/audio/bgm/bedroom-lullaby.mp3", volume: .14 },
-    street: { src: "assets/audio/bgm/good-day.mp3", volume: .16 },
-    restaurant: { src: "assets/audio/bgm/beyond-the-sea.mp3", volume: .09 },
-    epilogue: { src: "assets/audio/bgm/all-about-you.mp3", volume: .18 },
+    menu: { src: "assets/audio/bgm/all-about-you.mp3", volume: .1 },
+    bedroom: { src: "assets/audio/bgm/bedroom-lullaby.mp3", volume: .08 },
+    street: { src: "assets/audio/bgm/good-day.mp3", volume: .09 },
+    restaurant: { src: "assets/audio/bgm/beyond-the-sea.mp3", volume: .055 },
+    beach: { src: "beach/assets/ocean-loop.mp3", volume: .42 },
+    epilogue: { src: "assets/audio/bgm/all-about-you.mp3", volume: .1 },
   };
   const players = new Map();
   let desiredKey = "menu";
@@ -134,6 +135,11 @@ const orbitSceneBgm = (() => {
     fade(previous, 0, duration, true, true);
   }
 
+  function setLevel(key, volume, duration = 800) {
+    if (activeKey !== key || !bgmEnabled) return;
+    fade(playerFor(key), Math.max(0, Math.min(1, volume)), duration);
+  }
+
   function setEnabled(enabled) {
     if (!enabled) {
       players.forEach(audio => fade(audio, 0, 320, true, false));
@@ -158,7 +164,8 @@ const orbitSceneBgm = (() => {
   document.addEventListener("keydown", unlock, { once: true, capture: true });
   preload("menu");
   preload("bedroom");
-  return { enter, stop, preload, setEnabled, current: () => desiredKey };
+  preload("beach");
+  return { enter, stop, preload, setEnabled, setLevel, current: () => desiredKey };
 })();
 
 function applyLanguage(nextLanguage) {

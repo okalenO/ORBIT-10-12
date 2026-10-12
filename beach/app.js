@@ -256,6 +256,10 @@
   }
 
   function fadeOceanTo(volume, duration = 1600) {
+    if (bridge?.setOceanLevel) {
+      bridge.setOceanLevel(volume, duration);
+      return;
+    }
     state.oceanTargetVolume = Math.max(0, Math.min(1, volume));
     const start = oceanAudio.volume;
     const started = performance.now();
@@ -267,18 +271,29 @@
     requestAnimationFrame(tick);
   }
 
-  function tryPlayOcean() {
-    if (!state.soundOn) return;
+  async function tryPlayOcean() {
+    if (!state.soundOn) return false;
+    if (bridge?.playOcean) {
+      bridge.playOcean();
+      return true;
+    }
     oceanAudio.muted = false;
     oceanAudio.loop = true;
-    oceanAudio.play().catch(() => {});
+    try {
+      await oceanAudio.play();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
-  function unlockAudio() {
+  async function unlockAudio() {
     state.audioContext?.resume().catch(() => {});
-    tryPlayOcean();
-    document.removeEventListener("pointerdown", unlockAudio, true);
-    document.removeEventListener("keydown", unlockAudio, true);
+    const played = await tryPlayOcean();
+    if (played) {
+      document.removeEventListener("pointerdown", unlockAudio, true);
+      document.removeEventListener("keydown", unlockAudio, true);
+    }
   }
 
   function scheduleVisualTransition() {
@@ -764,6 +779,7 @@
       }
       applyLanguage();
     },
+    ensureAudio: unlockAudio,
     resumeFromFinale,
     pauseForFinale,
   };

@@ -43,7 +43,7 @@
 - `happy-birthday-musicbox.mp3`：八音盒生日快乐
 - `finale.mp4`：生日终幕视频
 - `finale-audio.mp3`：从终幕视频分离出的持续音轨
-- `cg-1.png`、`cg-2.jpg`：卧室终幕 CG
+- `cg-1.png`、`cg-2.png`：卧室终幕 CG
 
 ## 测试提示
 

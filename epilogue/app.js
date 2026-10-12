@@ -61,8 +61,8 @@
       cuteez: "CUTEeZ 表演服", plaid: "格子衬衫", check: "格子衬衫", striped: "亨利衫", henley: "亨利衫"
     }, "格子衬衫");
     const drink = normalizeChoice(raw.drink, {
-      americano: "美式咖啡", american: "美式咖啡", coffee: "美式咖啡", chamomile: "洋甘菊茶", tea: "洋甘菊茶", strawberry: "草莓奶昔", milkshake: "草莓奶昔", octopus: "章鱼脚"
-    }, "美式咖啡");
+      americano: "冰美式", american: "冰美式", coffee: "冰美式", chamomile: "洋甘菊茶", tea: "洋甘菊茶", strawberry: "草莓奶昔", milkshake: "草莓奶昔", octopus: "章鱼脚"
+    }, "冰美式");
     const lunch = normalizeChoice(raw.lunch, {
       gukbap: "韩式汤饭", soup: "韩式汤饭", cutlet: "炸猪排套餐", tonkatsu: "炸猪排套餐", porkcutlet: "炸猪排套餐", jokbal: "猪蹄"
     }, "猪蹄");
@@ -213,7 +213,7 @@
     }
     context.restore();
     context.fillStyle = "#6b5a4c"; context.font = "italic 21px Georgia"; context.textAlign = "center";
-    context.fillText("the moment we kept", 425, 800); context.textAlign = "left";
+    context.fillText(`the moment we kept · ${memory.frame}`, 425, 800); context.textAlign = "left";
 
     context.fillStyle = "#6f8650"; context.font = "900 26px Georgia"; context.fillText("TODAY'S ORBIT", 835, 275);
     const events = [
@@ -221,7 +221,7 @@
       ["11:30", `一起走过长街，带上了${memory.drink}`],
       ["12:30", `一起吃午餐，选择了${memory.lunch}`],
       ["15:00", "在海边按下快门，留下今天的拍立得"],
-      ["23:55", "陪他走到生日的最后一刻，一起说下“행복하자!”"]
+      ["23:55", "陪钟浩到生日的最后一秒，一起说下“행복하자!”"]
     ];
     let eventY = 345;
     for (const [time, description] of events) {

@@ -27,7 +27,6 @@
   const musicBoxAudio = $("#musicBoxAudio");
   const finaleAudio = $("#finaleAudio");
   const thinkingVideo = $("#thinkingVideo");
-  const cgOneVideo = $("#cgOneVideo");
 
   const languageAliases = { zh: "zh", cn: "zh", "zh-cn": "zh", ko: "ko", kr: "ko", en: "en" };
   const outfitAliases = { cuteez: "cuteez", plaid: "plaid", check: "plaid", grid: "plaid", striped: "striped", henley: "striped", 格子: "plaid", 亨利: "striped" };
@@ -183,7 +182,9 @@
     const context = createAudioContext();
     await context.resume().catch(() => {});
     const beachPhase = state.phase.startsWith("beach") || state.phase === "opening";
-    const oceanOk = beachPhase && oceanAudio.paused ? await tryPlay(oceanAudio, .42) : true;
+    const oceanOk = beachPhase
+      ? (bridge?.playOcean ? (bridge.playOcean(), true) : (oceanAudio.paused ? await tryPlay(oceanAudio, .42) : true))
+      : true;
     let singingOk = true;
     if (state.phase === "beach-listening" && !state.singingFinished && !state.singingStarted) singingOk = await beginSingingPlayback();
     if (oceanOk && singingOk) state.audioUnlocked = true;
@@ -198,8 +199,9 @@
     if (!played) return false;
     state.singingStarted = true;
     startSingingNotes();
-    fadeAudio(oceanAudio, state.soundOn ? .16 : 0, 1200);
-    fadeAudio(singingAudio, state.soundOn ? .68 : 0, 1800);
+    if (bridge?.setOceanLevel) bridge.setOceanLevel(state.soundOn ? .16 : 0, 1200);
+    else fadeAudio(oceanAudio, state.soundOn ? .16 : 0, 1200);
+    fadeAudio(singingAudio, state.soundOn ? .08 : 0, 1800);
     singingAudio.addEventListener("ended", finishSingingPhase, { once:true });
     return true;
   }
@@ -215,7 +217,10 @@
     state.singingFinished = true; state.phase = "beach-explore";
     singingAudio.pause();
     stopSingingNotes();
-    if (state.soundOn) fadeAudio(oceanAudio, .42, 1200);
+    if (state.soundOn) {
+      if (bridge?.setOceanLevel) bridge.setOceanLevel(.42, 1200);
+      else fadeAudio(oceanAudio, .42, 1200);
+    }
     setBeachInteraction(true); resetIdleTimer();
   }
   function spawnSingingNote() {
@@ -398,7 +403,7 @@
         setTimeout(resolve, 1250);
       };
       thinkingVideo.currentTime = 0;
-      thinkingVideo.volume = state.soundOn ? .82 : 0;
+      thinkingVideo.volume = state.soundOn ? .32 : 0;
       thinkingVideo.classList.add("is-active");
       thinkingVideo.onended = finish;
       thinkingVideo.onerror = () => setTimeout(finish, 2300);
@@ -433,9 +438,11 @@
   async function beginHomeTransition() {
     state.phase = "home-transition"; clearTimeout(state.birdTimer); hud.classList.add("is-hidden");
     const transition = $("#homeTransition"); transition.classList.add("is-active");
-    fadeAudio(oceanAudio, 0, 1000, true); singingAudio.pause();
+    if (bridge?.stopOcean) bridge.stopOcean(1000);
+    else fadeAudio(oceanAudio, 0, 1000, true);
+    singingAudio.pause();
     homeTransitionAudio.currentTime = 0; homeTransitionAudio.volume = 0;
-    if (await tryPlay(homeTransitionAudio, 0)) fadeAudio(homeTransitionAudio, state.soundOn ? .16 : 0, 1000);
+    if (await tryPlay(homeTransitionAudio, 0)) fadeAudio(homeTransitionAudio, state.soundOn ? .09 : 0, 1000);
     await wait(2000);
     if (state.phase !== "home-transition") return;
     state.homeTransitionTimer = setTimeout(enterBedroom, 5000);
@@ -444,7 +451,7 @@
     if (!state.phase.startsWith("bedroom") && !state.phase.startsWith("ending")) return;
     homeAudio.loop = true; homeAudio.currentTime = 0; homeAudio.volume = 0;
     const played = await tryPlay(homeAudio, 0);
-    if (played) fadeAudio(homeAudio, state.soundOn ? .14 : 0, 1800);
+    if (played) fadeAudio(homeAudio, state.soundOn ? .08 : 0, 1800);
     else playHomeFallback();
   }
   function enterBedroom() {
@@ -474,12 +481,6 @@
     const two = $(".cg-two");
     one.classList.toggle("is-active", index === 1);
     two.classList.toggle("is-active", index === 2);
-    if (index === 1) {
-      cgOneVideo.currentTime = 0;
-      cgOneVideo.play().catch(() => {});
-    } else {
-      cgOneVideo.pause();
-    }
   }
 
   function renderKeepsakes() {
@@ -579,7 +580,7 @@
     if (state.soundOn) {
       musicBoxAudio.volume = 0; musicBoxAudio.loop = false;
       musicBoxPlayed = await tryPlay(musicBoxAudio, 0);
-      if (musicBoxPlayed) fadeAudio(musicBoxAudio, .7, 2500);
+      if (musicBoxPlayed) fadeAudio(musicBoxAudio, .25, 2500);
       else playMusicBoxFallback();
     }
     if (musicBoxPlayed) {
@@ -610,7 +611,7 @@
       };
       video.currentTime = 0; video.muted = true; video.classList.add("is-active");
       state.finaleAudioStarted = false; state.finaleAudioFinished = false;
-      finaleAudio.currentTime = 0; finaleAudio.volume = state.soundOn ? .82 : 0;
+      finaleAudio.currentTime = 0; finaleAudio.volume = state.soundOn ? .32 : 0;
       finaleAudio.play().then(() => { state.finaleAudioStarted = true; }).catch(() => {
         state.finaleAudioFinished = true;
         bridge?.onFinaleAudioEnded?.();
@@ -710,9 +711,9 @@
   }
   async function init() {
     resizeStage(); loadPersistentData(); applyOutfit(); applyLanguage(); bindEvents(); renderKeepsakes();
-    oceanAudio.loop = true; singingAudio.loop = false; oceanAudio.volume=.42; singingAudio.volume=.24;
+    oceanAudio.loop = true; singingAudio.loop = false; oceanAudio.volume=.42; singingAudio.volume=.08;
     setBeachInteraction(false);
-    const autoOcean = await tryPlay(oceanAudio,.42);
+    const autoOcean = bridge?.playOcean ? (bridge.playOcean(), true) : await tryPlay(oceanAudio,.42);
     if (autoOcean) state.audioUnlocked=true;
     setScene(beachScene); state.phase="beach-waiting"; scheduleBird();
     await wait(500); $("#openingBlack").classList.add("is-gone");

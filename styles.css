@@ -441,8 +441,8 @@ html[lang="ko"] .sketch-button {
 .finale-game-scene.is-preparing { visibility: visible; }
 .finale-game-scene.is-active { visibility: visible; opacity: 1; pointer-events: auto; transition-delay: 0s; }
 .finale-game-scene iframe { width: 100%; height: 100%; border: 0; display: block; }
-.epilogue-game-scene { position:absolute; inset:0; z-index:29; visibility:hidden; pointer-events:none; overflow:hidden; background:#f4eedf; clip-path:inset(0 0 100% 0); transition:clip-path 1.3s cubic-bezier(.22,.72,.2,1),visibility 0s 1.3s; }
+.epilogue-game-scene { position:absolute; inset:0; z-index:29; visibility:hidden; opacity:0; pointer-events:none; overflow:hidden; background:#070606; transition:opacity .85s ease,visibility 0s .85s; }
 .epilogue-game-scene.is-preparing { visibility:visible; }
-.epilogue-game-scene.is-active { visibility:visible; clip-path:inset(0 0 0 0); pointer-events:auto; transition-delay:0s; }
-.epilogue-game-scene iframe { width:100%; height:100%; border:0; display:block; transform:translateY(-4%); transition:transform 1.3s cubic-bezier(.22,.72,.2,1); }
-.epilogue-game-scene.is-active iframe { transform:translateY(0); }
+.epilogue-game-scene.is-active { visibility:visible; opacity:1; pointer-events:auto; transition-delay:0s; }
+.epilogue-game-scene iframe { width:100%; height:100%; border:0; display:block; opacity:0; transition:opacity .85s ease; }
+.epilogue-game-scene.is-ready iframe { opacity:1; }

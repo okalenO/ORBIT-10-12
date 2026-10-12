@@ -21,6 +21,7 @@
 
   function showFinale() {
     window.orbitGameState.currentScene = 'finale';
+    window.orbitBgm?.enter?.('beach', 1000);
     window.orbitBeach?.pauseForFinale?.();
     scene.setAttribute('aria-hidden', 'false');
     scene.classList.add('is-preparing');
@@ -62,6 +63,9 @@
     setLanguage: language => frame.contentWindow?.orbitFinaleScene?.setLanguage?.(language),
     setSound: enabled => frame.contentWindow?.orbitFinaleScene?.setSound?.(enabled),
     toggleSound: () => window.orbitMenu.toggleBgm(),
+    playOcean: () => window.orbitBgm?.enter?.('beach', 1000),
+    setOceanLevel: (volume, duration) => window.orbitBgm?.setLevel?.('beach', volume, duration),
+    stopOcean: duration => window.orbitBgm?.stop?.(duration),
     returnToBeach,
     enterEpilogue: () => window.orbitEpilogue?.enter?.(),
     onFinaleAudioEnded: () => window.orbitEpilogue?.onFinaleAudioEnded?.(),
