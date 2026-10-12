@@ -479,8 +479,10 @@
   function activateCg(index) {
     const one = $(".cg-one");
     const two = $(".cg-two");
+    const three = $(".cg-three");
     one.classList.toggle("is-active", index === 1);
     two.classList.toggle("is-active", index === 2);
+    three.classList.toggle("is-active", index === 3);
   }
 
   function renderKeepsakes() {
@@ -639,7 +641,7 @@
     $("#videoFallback").classList.remove("is-active");
     clearTimeout(state.responseTimer);
     $("#birthdayMoment").classList.remove("is-active", "is-response-ready");
-    activateCg(1); $("#cgLayer").classList.add("is-visible");
+    activateCg(3); $("#cgLayer").classList.add("is-visible");
     await wait(1450); $("#finalBlack").classList.add("is-active");
     window.dispatchEvent(new CustomEvent("orbit:main-story-complete", { detail: { completedAt:"00:00 / OCT 13" } }));
     try { localStorage.setItem("orbit:mainStoryComplete", "true"); } catch (_) {}
