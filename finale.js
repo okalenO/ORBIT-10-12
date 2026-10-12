@@ -58,7 +58,7 @@
         return;
       }
       frame.addEventListener('load', showFinale, { once: true });
-      frame.src = 'finale/index.html';
+      frame.src = 'finale/index.html?v=20261012-copy1';
     },
     setLanguage: language => frame.contentWindow?.orbitFinaleScene?.setLanguage?.(language),
     setSound: enabled => frame.contentWindow?.orbitFinaleScene?.setSound?.(enabled),

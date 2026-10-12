@@ -26,7 +26,7 @@
         frameReady = true;
         resolve();
       }, { once: true });
-      frame.src = 'street/index.html';
+      frame.src = 'street/index.html?v=20261012-copy1';
     });
     return preparePromise;
   }

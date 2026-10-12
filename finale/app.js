@@ -33,81 +33,81 @@
   const copy = {
     zh: {
       place: "卧室", audio: "点击画面开启声音", continue: "继续", talk: "对话", go: "走吧",
-      noticed1: "你好像很喜欢到处点点诶？", noticed2: "今天点了好多东西吧。",
-      player: "因为钟浩看起来像是在想事情。", romantic: "因为现在很浪漫嘛~~",
+      noticed1: "嗯？又在到处点点吗", noticed2: "你今天好像很喜欢找东西呢",
+      player: "因为钟浩看起来在想什么事情", romantic: "因为现在很浪漫嘛~~",
       monologue: [
         "我想，今年真的尝试了很多第一次，好像也发生了很多比想象中更好的事情。",
         "去了巴黎，也第一次一个人拍了画报……活动期间还取得了很好的成绩，所以我也会想：‘啊，原来我又成长了一点。’",
-        "但每当遇到这样的时刻，最后最先想到的好像还是 ATINY。",
+        "每当遇到这样的时刻，最后最先想到的好像还是 ATINY。",
         "虽然真的是经常说的话……但我不能没有 ATINY，不是吗？",
         "希望 ATINY 能像我感受到幸福一样幸福。即使遇到辛苦的时刻，也希望我们能够成为彼此的一点力量。",
-        "我会继续唱歌的。",
+        "所以我会继续唱歌的。",
         "我想长长久久地，成为一直在 ATINY 面前唱歌的人。",
-        "所以以后我们也……一起幸福吧~！"
+        "所以以后我们也…一起幸福吧~！"
       ],
       goHome: "有点晚了，我们一起吃个晚饭，差不多该回去了吧？",
-      prepared: "这些蛋糕之类的……都是你准备的吗？",
+      prepared: "这些蛋糕之类的…都是你准备的吗？",
       bedroomLines: [
-        "今天明明是我的生日……结果你做了很多事呢？",
+        "今天明明是我的生日…结果你做了很多事呢？",
         "早上叫我起床，帮我选了衣服，陪我慢慢走了一路。",
         "午餐也替我想了，蛋糕也是你准备的，还帮我拍了照片。",
         "我们真的一起留下了很多回忆。"
       ],
-      fiveMinutes: "今天也只剩五分钟了呢。", noClock: "等一下……现在好像不用再看时间了。",
-      replyThanks: "我也同样谢谢你", takePhoto: "现在换我来给你拍一张照吧。",
+      fiveMinutes: "今天也只剩五分钟了呢。", noClock: "等一下，现在好像不用再看时间了。",
+      replyThanks: "我也同样要谢谢钟浩啊", takePhoto: "现在换我来给你拍一张照吧。",
       thankYou: "谢谢你一直在我身边", epilogueHint: "点击空白处进入尾声", letter: "制作者来信正文将在最终版本补充。"
     },
     ko: {
       place: "침실", audio: "화면을 눌러 소리를 켜 주세요", continue: "계속", talk: "대화", go: "가자",
-      noticed1: "여기저기 눌러보는 거 되게 좋아하나 봐?", noticed2: "오늘 진짜 이것저것 많이 눌러봤지.",
+      noticed1: "응? 또 여기저기 눌러 보고 있어?", noticed2: "오늘은 이것저것 찾는 게 꽤 재미있나 보네.",
       player: "종호가 뭔가 생각하고 있는 것 같아서?", romantic: "지금 좀 낭만적이잖아~~",
       monologue: [
-        "올해는 처음 해본 것도 진짜 많았고, 생각보다 좋은 일도 많이 있었던 것 같아.",
-        "파리도 가보고, 혼자 화보도 찍어보고…… 활동하면서 좋은 결과도 많이 받아서, 나도 ‘아, 내가 또 조금은 성장했구나’ 하는 생각이 들었어.",
-        "근데 그런 순간마다 결국 제일 먼저 생각나는 건 에이티니였던 것 같아.",
-        "진짜 항상 하는 말이긴 한데…… 나는 에이티니 없으면 안 되잖아.",
-        "내가 행복한 만큼 에이티니도 행복했으면 좋겠고, 힘든 순간이 오더라도 서로한테 조금이라도 힘이 될 수 있었으면 좋겠어.",
-        "나는 계속 노래할게.",
-        "오래오래, 에이티니 앞에서 계속 노래하는 사람이 되고 싶어.",
-        "그러니까 우리 앞으로도…… 같이 행복하자~!"
+        "생각해 보니까 올해는 처음 해 본 것도 정말 많았고, 생각보다 좋은 일도 많이 있었던 것 같아.",
+        "파리에도 가 보고, 처음으로 혼자 화보도 찍어 보고… 활동하면서 좋은 결과도 얻어서, 나도 ‘아, 내가 또 조금 성장했구나’ 싶었어.",
+        "그런 순간마다 결국 제일 먼저 생각나는 건 에이티니였던 것 같아.",
+        "진짜 자주 하는 말이긴 한데… 나는 에이티니 없으면 안 되잖아 그렇지?",
+        "내가 느끼는 행복만큼 에이티니도 행복했으면 좋겠어. 힘든 순간이 와도 우리가 서로에게 조금이나마 힘이 됐으면 좋겠고.",
+        "그러니까 나는 계속 노래할게.",
+        "오래오래 에이티니 앞에서 계속 노래하는 사람이 되고 싶어.",
+        "그러니까 앞으로도 우리… 같이 행복하자~!"
       ],
       goHome: "조금 늦었네. 같이 저녁 먹고, 이제 슬슬 돌아갈까?",
-      prepared: "이 케이크 같은 것도…… 네가 다 준비한 거야?",
+      prepared: "이 케이크 같은 것들도… 네가 다 준비한 거야?",
       bedroomLines: [
-        "오늘은 분명 내 생일인데…… 네가 더 바빴던 것 같아.",
-        "아침에 깨워주고, 옷도 골라주고, 같이 천천히 걸어줬잖아.",
-        "점심도 같이 골라주고, 케이크도 준비해 주고, 사진도 찍어줬고.",
-        "우리 오늘 진짜 많은 추억을 남겼네."
+        "오늘은 분명 내 생일인데… 오히려 네가 더 많은 걸 해 줬네?",
+        "아침에 나 깨워 주고, 옷도 골라 주고, 나랑 천천히 걸어 주고.",
+        "점심 메뉴도 같이 고민해 주고, 케이크도 준비해 주고, 사진도 찍어 줬잖아.",
+        "우리 오늘 정말 많은 추억을 만들었네."
       ],
-      fiveMinutes: "오늘도 이제 5분밖에 안 남았네.", noClock: "잠깐만…… 이제 시간은 안 봐도 될 것 같아.",
-      replyThanks: "나도 똑같이 고마워", takePhoto: "이번에는 내가 사진 한 장 찍어줄게.",
-      thankYou: "계속 내 곁에 있어줘서 고마워", epilogueHint: "빈 곳을 눌러 에필로그로", letter: "제작자의 편지는 최종 버전에서 추가됩니다."
+      fiveMinutes: "오늘도 이제 5분밖에 안 남았네.", noClock: "잠깐만… 이제 시간은 안 봐도 될 것 같아.",
+      replyThanks: "나도 종호한테 그만큼 고마워.", takePhoto: "이번에는 내가 사진 한 장 찍어 줄게.",
+      thankYou: "늘 내 곁에 있어 줘서 고마워.", epilogueHint: "빈 곳을 눌러 에필로그로", letter: "제작자의 편지는 최종 버전에서 추가됩니다."
     },
     en: {
       place: "BEDROOM", audio: "TAP TO ENABLE SOUND", continue: "CONTINUE", talk: "TALK", go: "LET'S GO",
-      noticed1: "You really like tapping on little things, don't you?", noticed2: "You found so many things to tap today.",
+      noticed1: "Hm? Tapping around again?", noticed2: "You seem to really enjoy looking for things today.",
       player: "Because you looked like you had something on your mind?", romantic: "Because this feels kind of romantic right now~~",
       monologue: [
-        "I think I tried so many things for the first time this year, and more good things happened than I expected.",
-        "I went to Paris and did my first solo pictorial… We also had such good results during promotions that I thought, ‘Oh, I really have grown a little more.’",
-        "But in moments like those, ATINY were still the first people who came to mind.",
-        "I know I say this all the time… but I really can't do this without ATINY.",
-        "I hope ATINY can be as happy as I am. Even when things get hard, I hope we can give each other a little strength.",
-        "I'll keep singing.",
-        "For a long, long time, I want to be someone who keeps singing in front of ATINY.",
-        "So from now on too… let's be happy together~!"
+        "Come to think of it, I tried so many things for the first time this year, and so many things turned out even better than I expected.",
+        "I went to Paris, had my first solo magazine shoot… and we had such great results during BAD. It made me think, ‘Ah, I’ve grown a little more.’",
+        "Whenever something like that happens, ATINY are still the first people who come to mind.",
+        "I know I say this all the time… but I couldn’t do any of this without ATINY, right?",
+        "I hope ATINY can feel just as happy as I do. Even when things get hard, I hope we can be a little source of strength for each other.",
+        "So I’ll keep singing.",
+        "I want to keep singing for ATINY for a long, long time.",
+        "So from now on… let’s keep being happy together~!"
       ],
-      goHome: "It's getting late. Let's have dinner together, then maybe head home?",
-      prepared: "All of this—the cake and everything… did you prepare it?",
+      goHome: "It’s getting late. Let’s have dinner together, then head home.",
+      prepared: "Did you prepare all of this too—the cake and everything?",
       bedroomLines: [
-        "It was supposed to be my birthday… but you ended up doing so much.",
-        "You woke me up, picked my clothes, and walked slowly with me all day.",
-        "You helped choose lunch, prepared the cake, and even took my photo.",
-        "We really made so many memories together."
+        "It was my birthday… and yet you ended up doing so much for me.",
+        "You woke me up this morning, picked out my clothes, and took a slow walk with me.",
+        "You helped me choose lunch, prepared the cake, and even took photos for me.",
+        "We really made a lot of memories together today."
       ],
-      fiveMinutes: "There are only five minutes left today.", noClock: "Wait… I don't think we need to watch the time anymore.",
-      replyThanks: "I'm just as thankful to you", takePhoto: "Now it's my turn to take a photo of you.",
-      thankYou: "Thank you for always staying by my side", epilogueHint: "TAP ANYWHERE TO ENTER THE EPILOGUE", letter: "The creator's letter will be added in the final version."
+      fiveMinutes: "There are only five minutes left today.", noClock: "Wait… I don’t think we need to watch the clock anymore.",
+      replyThanks: "I’m just as grateful to you.", takePhoto: "Now it’s my turn to take a photo of you.",
+      thankYou: "Thank you for always being by my side", epilogueHint: "TAP ANYWHERE TO ENTER THE EPILOGUE", letter: "The creator's letter will be added in the final version."
     }
   };
 

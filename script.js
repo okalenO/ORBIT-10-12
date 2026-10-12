@@ -41,7 +41,7 @@ const copy = {
     off: "关闭",
   },
   ko: {
-    talkCharacter: "종호에게 말 걸기",
+    talkCharacter: "종호와 대화하기",
     start: "시작",
     bgm: "음악",
     language: "언어",

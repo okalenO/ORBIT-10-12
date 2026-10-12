@@ -47,7 +47,7 @@
       prepare();
       if (frame.getAttribute('src')) { show(); return; }
       frame.addEventListener('load', show, { once:true });
-      frame.src = 'epilogue/index.html';
+      frame.src = 'epilogue/index.html?v=20261012-copy1';
     },
     onFinaleAudioEnded() {
       finaleAudioEnded = true;

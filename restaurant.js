@@ -51,7 +51,7 @@
           }, 680);
         }));
       }, { once: true });
-      frame.src = 'restaurant/index.html';
+      frame.src = 'restaurant/index.html?v=20261012-copy1';
     },
     returnToStreet: () => {
       window.orbitStreet.resume();

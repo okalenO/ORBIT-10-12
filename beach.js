@@ -49,7 +49,7 @@
           window.setTimeout(() => window.orbitRestaurant?.hideForBeach(), 900);
         }));
       }, { once: true });
-      frame.src = 'beach/index.html';
+      frame.src = 'beach/index.html?v=20261012-copy1';
     },
     returnToRestaurant: () => {
       window.orbitRestaurant?.resume();
